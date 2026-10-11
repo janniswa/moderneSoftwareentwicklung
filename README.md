@@ -12,17 +12,18 @@ Git ist ein kostenloses, verteiltes Versionskontrollsystem. Es speichert die His
 - Flexibilität: Git funktioniert auch ohne Internetverbindung mit einem lokalen Repository.
 
 ## Grundlagen
-Wichtige Begriffe:
-Repository (kurz Repo): Projekt mit Dateien und Versionsgeschichte
-Working Directory: Arbeitsverzeichnis, in dem du Dateien bearbeitest
-Staging Area: Bereich, in dem du Änderungen für den nächsten Commit auswählst
-Commit: Gespeicherter Projektstand mit einer Beschreibung
-Branch: Separater Entwicklungszweig
-Merge: Zusammenführen von Änderungen aus verschiedenen Branches
-Remote Repository: Entferntes Repository, beispielsweise auf GitHub
-Push: Lokale Commits zum Remote Repository übertragen
-Pull: Änderungen aus einem Remote Repository abrufen und integrieren
-Clone: Eine vorhandene Repository-Kopie erstellen
+| Begriff | Bedeutung |
+|---|---|
+| Repository (Repo) | Projekt mit Dateien und Versionsgeschichte |
+| Working Directory | Arbeitsverzeichnis, in dem du Dateien bearbeitest |
+| Staging Area | Bereich, in dem du Änderungen für den nächsten Commit auswählst |
+| Commit | Gespeicherter Projektstand mit einer Beschreibung |
+| Branch | Separater Entwicklungszweig |
+| Merge | Zusammenführen von Änderungen aus verschiedenen Branches |
+| Remote Repository | Entferntes Repository, beispielsweise auf GitHub |
+| Push | Lokale Commits zum Remote Repository übertragen |
+| Pull | Änderungen aus einem Remote Repository abrufen und integrieren |
+| Clone | Eine vorhandene Repository-Kopie erstellen |
 
 #### Branches und ihre Nutzung
 ### Merge
