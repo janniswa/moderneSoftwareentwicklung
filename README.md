@@ -25,6 +25,31 @@ Git ist ein kostenloses, verteiltes Versionskontrollsystem. Es speichert die His
 | Pull | Änderungen aus einem Remote Repository abrufen und integrieren |
 | Clone | Eine vorhandene Repository-Kopie erstellen |
 
+## Grundlegende Git-Befehle
+
+Die folgenden Befehle gehören zu den wichtigsten Git-Kommandos:
+
+- `git init`  
+  Erstellt ein neues lokales Git-Repository.
+
+- `git clone <repository-url>`  
+  Erstellt eine lokale Kopie eines vorhandenen Remote-Repositories.
+
+- `git status`  
+  Zeigt an, welche Dateien verändert wurden und welchen Status sie haben.
+
+- `git add <datei>`  
+  Fügt eine neue oder geänderte Datei zur Staging Area hinzu.
+
+- `git commit -m "Nachricht"`  
+  Speichert die vorgemerkten Änderungen als neuen Commit im lokalen Repository.
+
+- `git push`  
+  Überträgt lokale Commits in das Remote-Repository.
+
+- `git pull`  
+  Lädt Änderungen aus dem Remote-Repository und integriert sie in den aktuellen Branch.
+
 #### Branches und ihre Nutzung
 ### Merge
 #### Umgang mit Merge-Konflikten
