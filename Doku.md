@@ -1,3 +1,7 @@
+
+Status: ![Java CI](https://github.com/janniswa/moderneSoftwareentwicklung/actions/workflows/ci.yml/badge.svg)
+
+
 ## CI/CD-Pipeline
 
 Für unser Projekt verwenden wir GitHub Actions zur Automatisierung unseres Entwicklungsprozesses.
