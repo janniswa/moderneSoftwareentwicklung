@@ -92,6 +92,8 @@ Die Konfiguration der Pipeline befindet sich im Repository unter:
 
 `.github/workflows/ci.yml`
 
+Status: ![Java CI](https://github.com/janniswa/moderneSoftwareentwicklung/actions/workflows/ci.yml/badge.svg)
+
 ## Aktueller Ablauf der CI-Pipeline
 
 Die Pipeline wird automatisch ausgeführt, wenn Änderungen in das Repository gepusht werden oder ein Pull Request erstellt beziehungsweise aktualisiert wird.
@@ -161,3 +163,81 @@ Gleichzeitig müssen einige Aspekte berücksichtigt werden:
 Das beschriebene Deployment mit **Render und PostgreSQL stellt aktuell lediglich eine mögliche Lösung dar und ist noch keine endgültige Technologieentscheidung**.
 
 Im weiteren Projektverlauf soll geprüft werden, ob diese Variante zum tatsächlich verwendeten Technologie-Stack und zu den Anforderungen von CityFeedback passt. Bei Bedarf kann die Deployment-Plattform entsprechend angepasst werden.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Übung 3 – Systemarchitektur
+
+## 01 Event Storming
+
+Die Event-Storming-Session dient dazu, die wichtigsten Abläufe im Projekt sichtbar zu machen. Dabei wurden folgende Events identifiziert und den notwendigen Interaktionen bzw. Triggern zugeordnet:
+
+### 1. UserRegistered
+Dieses Event wird ausgelöst, wenn sich ein neuer Bürger erfolgreich bei CityFeedback registriert hat. Der Benutzer wird im System angelegt und kann anschließend die Funktionen der Anwendung nutzen.
+
+### 2. UserLoggedIn
+Dieses Event wird ausgelöst, wenn sich ein Benutzer erfolgreich im System anmeldet. Der Benutzer erhält Zugriff auf die für seine Rolle verfügbaren Funktionen.
+
+### 3. ComplaintCreated
+Dieses Event wird ausgelöst, wenn ein Bürger eine neue Beschwerde erstellt und diese erfolgreich im System gespeichert wurde. Die Beschwerde kann anschließend von der Verwaltung eingesehen und bearbeitet werden.
+
+### 4. CommentAdded
+Dieses Event wird ausgelöst, wenn ein Bürger oder ein Verwaltungsmitarbeiter einen Kommentar zu einer bestehenden Beschwerde hinzufügt. Dadurch wird die Kommunikation zwischen den Beteiligten dokumentiert.
+
+### 5. ComplaintStatusChanged
+Dieses Event wird ausgelöst, wenn der Bearbeitungsstatus einer Beschwerde geändert wird. Beispielsweise kann eine Beschwerde von „Neu“ auf „In Bearbeitung“ oder auf „Abgeschlossen“ gesetzt werden. Die Statusänderung ermöglicht es den Beteiligten, den aktuellen Bearbeitungsstand nachzuvollziehen.
+
+### 6. ComplaintResolved
+Dieses Event wird ausgelöst, wenn eine Beschwerde erfolgreich bearbeitet und als gelöst markiert wurde. Der Status der Beschwerde wird auf „Gelöst“ gesetzt. Dadurch wird dokumentiert, dass das Anliegen des Bürgers abgeschlossen wurde. Gegebenenfalls kann der Bürger anschließend über die Lösung informiert werden.
+
+Die Ereignisse zeigen den Lebenszyklus einer Beschwerde von der Erstellung bis zur Lösung:
+
+<img width="1110" height="900" alt="Complaint Management - Event Storming - Übersicht Events" src="https://github.com/user-attachments/assets/42f110e3-2b63-47f9-aafa-179ee550c86c" />
+
+Um die zwei wesentlichen Anwendungsfälle (Erstellung einer Beschwerde durch einen "Bürger" & Bearbeitung und Abschluss einer Beschwerde durch einen Verwaltungsmitarbeiter) abzubilden, wurden die Interaktionen bzw. Events in der notwendigen Reihenfolge abgebildet.
+Die Kombination beider Anwendungsfälle stellt den Happy Path unseres Prozesses dar:
+
+<img width="1741" height="574" alt="Complaint Management - Event Storming - Prozess 2 in 1" src="https://github.com/user-attachments/assets/e6415e7b-1105-4561-b9f4-6b4911ef3915" />
+
+## 02 Domänenmodell
+
+------hier ergänzen--------
+
+## 03 Bounded Contexts
+
+Um die fachlichen Verantwortlichkeiten innerhalb der Anwendung klar voneinander zu trennen, wird sie in verschiedene Bounded Contexts unterteilt. Jeder Context übernimmt dabei einen bestimmten Aufgabenbereich und enthält die dazugehörige fachliche Logik. Dadurch soll die Komplexität reduziert und eine übersichtliche Softwarearchitektur geschaffen werden.
+
+### Identity Context
+
+Der Identity Context ist für die Verwaltung der Benutzer zuständig. Dazu gehören die Registrierung neuer Benutzer sowie die Anmeldung am System. Außerdem werden die verschiedenen Benutzerrollen, beispielsweise Bürger und Verwaltungsmitarbeiter, berücksichtigt. Dieser Context stellt sicher, dass Benutzer identifiziert werden können und Zugriff auf die für sie vorgesehenen Funktionen erhalten.
+
+### Complaint Management Context
+
+Der Complaint Management Context bildet den zentralen Bereich der Anwendung. Er ist für die Erstellung, Verwaltung und Bearbeitung von Beschwerden verantwortlich. Bürger können neue Beschwerden einreichen, während Verwaltungsmitarbeiter diese einsehen und bearbeiten können. Dazu gehört auch die Verwaltung des Beschwerdestatus, beispielsweise von „Neu“ über „In Bearbeitung“ bis hin zu „Gelöst“ (Siehe Abbildung 2 Event Storming).
+
+### Communication Context
+
+Der Communication Context umfasst die Kommunikation zwischen Bürgern und Verwaltungsmitarbeitern. Benutzer können Kommentare zu bestehenden Beschwerden hinzufügen und dadurch Informationen oder Rückfragen austauschen. Die Kommentare werden der jeweiligen Beschwerde zugeordnet und ermöglichen eine nachvollziehbare Kommunikation über den Bearbeitungsverlauf.
+
+### Notification Context (optional)
+
+Der Notification Context ist als mögliche Erweiterung der Anwendung vorgesehen. Seine Aufgabe besteht darin, Benutzer über wichtige Ereignisse zu informieren - ob in-App oder per Mail. Dazu gehören beispielsweise Änderungen des Beschwerdestatus oder neue Kommentare zu einer Beschwerde. Dieser Bereich ist zunächst optional und kann bei Bedarf zu einem späteren Zeitpunkt umgesetzt werden.
+
+### Darstellung der Bounded Contexts
+
+Die folgende Abbildung zeigt die identifizierten Bounded Contexts und verdeutlicht die Aufteilung der Anwendung in die verschiedenen fachlichen Verantwortungsbereiche sowie deren mögliche Beziehungen zueinander:
+
+<img width="1380" height="724" alt="Complaint Management - Bounded Contexts" src="https://github.com/user-attachments/assets/2aae6675-5170-4517-a81e-bace61b0daa7" />
+
+## 04 Entäten und Aggregate
+
+------hier ergänzen--------
+
+## 05 Domain Services und Repositories
+
+------hier ergänzen--------
+
+## 06  ImplemenEerungsstrategie
+
+------hier ergänzen--------
+
+
