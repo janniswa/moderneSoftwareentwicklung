@@ -50,8 +50,6 @@ Die Kategorie einer Beschwerde wird zunächst als String gespeichert.
 
 ### 5. Detaillierte Beschreibung der Entities
 
-Die Attribute, Methoden und fachlichen Regeln werden in den folgenden Abschnitten ergänzt.
-
 #### 5.1 User – Identity Context
 
 **Typ:** Entity und Aggregate Root
