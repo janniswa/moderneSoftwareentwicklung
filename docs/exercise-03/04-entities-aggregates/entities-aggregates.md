@@ -104,6 +104,81 @@ Die Entity `User` repräsentiert einen registrierten Benutzer des CityFeedback-S
 
 Diese Events stammen aus dem Event Storming. Ihre technische Erzeugung wird später in der Anwendungslogik berücksichtigt.
 
+#### 5.2 Complaint – Complaint Management Context
+
+**Typ:** Entity und Aggregate Root
+
+**Bounded Context:** Complaint Management Context
+
+**Beschreibung:**
+
+Die Entity `Complaint` repräsentiert eine Beschwerde, die von einem Bürger im CityFeedback-System eingereicht wurde.
+
+Sie bildet die Aggregate Root des Complaint Aggregates und ist für die Verwaltung des Bearbeitungsstatus sowie der zugehörigen Kommentare verantwortlich.
+
+Eine Beschwerde wird von einem Bürger erstellt und anschließend durch Mitarbeiter der Stadtverwaltung bearbeitet.
+
+**Attribute:**
+
+| Attribut | Datentyp | Beschreibung |
+|---|---|---|
+| id | String | Eindeutige Beschwerde-ID |
+| citizenId | String | ID des Bürgers, der die Beschwerde erstellt hat |
+| title | String | Titel der Beschwerde |
+| description | String | Ausführliche Beschreibung des Anliegens |
+| category | String | Kategorie der Beschwerde, z. B. Beleuchtung oder Verkehr |
+| status | ComplaintStatus | Aktueller Bearbeitungsstatus |
+| createdAt | LocalDateTime | Zeitpunkt der Erstellung |
+
+**Methoden:**
+
+| Methode | Rückgabetyp | Beschreibung |
+|---|---|---|
+| changeStatus(newStatus: ComplaintStatus) | void | Ändert den Bearbeitungsstatus einer Beschwerde |
+| addComment(comment: Comment) | void | Fügt der Beschwerde einen Kommentar hinzu |
+| resolve() | void | Markiert die Beschwerde als erledigt |
+
+**Fachliche Regeln:**
+
+- Jede Beschwerde besitzt eine eindeutige ID.
+- Jede Beschwerde gehört genau einem Bürger.
+- Eine neu erstellte Beschwerde erhält den Status `OPEN`.
+- Eine Beschwerde kann die Status `OPEN`, `IN_PROGRESS` oder `RESOLVED` besitzen.
+- Die Änderung des Bearbeitungsstatus ist ausschließlich Verwaltungsmitarbeitern erlaubt.
+- Eine Beschwerde kann mehrere Kommentare enthalten.
+- Kommentare dürfen ausschließlich von Verwaltungsmitarbeitern hinzugefügt werden.
+- Bürger können ihre eigenen Beschwerden einschließlich des aktuellen Status und der Kommentare einsehen.
+- Die Methode `resolve()` setzt den Bearbeitungsstatus auf `RESOLVED`.
+- Die Berechtigungen werden vor dem Aufruf der fachlichen Methoden durch die zuständige Anwendungslogik überprüft.
+
+**Beziehungen:**
+
+- Jede Beschwerde gehört genau einem Benutzer mit der Rolle `CITIZEN`.
+- Ein Bürger kann mehrere Beschwerden erstellen.
+- Eine Beschwerde kann null bis beliebig viele Kommentare enthalten.
+- Jeder Kommentar gehört genau einer Beschwerde.
+- Die Entity `Comment` ist Bestandteil des Complaint Aggregates und wird über die Aggregate Root `Complaint` verwaltet.
+- Die Aggregate Root stellt sicher, dass Änderungen innerhalb des Aggregates kontrolliert durchgeführt werden.
+
+**Zugehörige Domain Events:**
+
+- `ComplaintCreated`: Eine neue Beschwerde wurde erfolgreich erstellt.
+- `ComplaintStatusChanged`: Der Bearbeitungsstatus einer Beschwerde wurde geändert.
+- `CommentAdded`: Ein Verwaltungsmitarbeiter hat einen Kommentar hinzugefügt.
+- `ComplaintResolved`: Eine Beschwerde wurde als erledigt markiert.
+
+`ComplaintStatusChanged` beschreibt allgemeine Statusänderungen. `ComplaintResolved` kennzeichnet zusätzlich den fachlichen Abschluss einer Beschwerde.
+
+Die tatsächliche technische Erzeugung und Verarbeitung dieser Events wird in der späteren Implementierung berücksichtigt.
+
+**DDD-Einordnung:**
+
+`Complaint` ist die Aggregate Root und kontrolliert Änderungen am Bearbeitungsstatus sowie das Hinzufügen von Kommentaren.
+
+Die Entity `Comment` wird als untergeordneter Bestandteil des Complaint Aggregates betrachtet.
+
+Andere Komponenten greifen für Änderungen an der Beschwerde und ihren Kommentaren über die Aggregate Root zu. Dadurch bleiben die fachlichen Regeln innerhalb des Aggregates nachvollziehbar und konsistent.
+
 ### 6. Beziehungen zwischen den Aggregates
 
 Die Beziehungen und Konsistenzregeln werden im weiteren Verlauf dokumentiert.
