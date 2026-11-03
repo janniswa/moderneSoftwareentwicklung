@@ -198,9 +198,21 @@ Die Kombination beider Anwendungsfälle stellt den Happy Path unseres Prozesses 
 
 <img width="1741" height="574" alt="Complaint Management - Event Storming - Prozess 2 in 1" src="https://github.com/user-attachments/assets/e6415e7b-1105-4561-b9f4-6b4911ef3915" />
 
+
 ## 02 Domänenmodell
 
-------hier ergänzen--------
+Das Domänenmodell für CityFeedback wurde als UML-Klassendiagramm
+mit PlantUML erstellt.
+
+Es umfasst die Entities User, Complaint und Comment sowie die
+Enums UserRole und ComplaintStatus.
+
+Das Diagramm stellt die Attribute, Methoden, Beziehungen und
+Kardinalitäten der wichtigsten Domänenobjekte dar.
+
+- [UML-Klassendiagramm](docs/exercise-03/02-domain-model/DomainModel.png)
+- [PlantUML-Quelldatei](docs/exercise-03/02-domain-model/domain-model.puml)
+
 
 ## 03 Bounded Contexts
 
@@ -228,9 +240,21 @@ Die folgende Abbildung zeigt die identifizierten Bounded Contexts und verdeutlic
 
 <img width="1380" height="724" alt="Complaint Management - Bounded Contexts" src="https://github.com/user-attachments/assets/2aae6675-5170-4517-a81e-bace61b0daa7" />
 
-## 04 Entäten und Aggregate
 
-------hier ergänzen--------
+## 04 Entitäten und Aggregate
+
+Für CityFeedback wurden zwei zentrale Aggregate definiert:
+
+- User Aggregate mit User als Aggregate Root
+- Complaint Aggregate mit Complaint als Aggregate Root und
+  Comment als untergeordneter Entity
+
+Die detaillierte Dokumentation beschreibt die Attribute,
+Methoden, Beziehungen, fachlichen Regeln und
+Konsistenzgrenzen der Aggregate.
+
+[Dokumentation: Entities und Aggregates](docs/exercise-03/04-entities-aggregates/entities-aggregates.md)
+
 
 ## 05 Domain Services und Repositories
 
