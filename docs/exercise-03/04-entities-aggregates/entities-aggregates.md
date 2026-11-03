@@ -256,4 +256,100 @@ Die Zuordnung zu einer Beschwerde erfolgt innerhalb des Aggregates. Die `complai
 
 ### 6. Beziehungen zwischen den Aggregates
 
-Die Beziehungen und Konsistenzregeln werden im weiteren Verlauf dokumentiert.
+Das CityFeedback-System besteht im aktuellen Domänenmodell aus zwei zentralen Aggregates: dem User Aggregate und dem Complaint Aggregate.
+
+Die Aggregate sind fachlich miteinander verbunden, besitzen jedoch jeweils eigene Verantwortlichkeiten und Konsistenzgrenzen.
+
+#### 6.1 Beziehung zwischen User und Complaint
+
+Ein Benutzer mit der Rolle `CITIZEN` kann mehrere Beschwerden erstellen. Jede Beschwerde gehört genau einem Bürger.
+
+Die Beziehung wird über das Attribut `citizenId` innerhalb der Entity `Complaint` hergestellt.
+
+**Kardinalität:**
+- Ein User (CITIZEN) kann 0 bis beliebig viele Complaints erstellen.
+- Jede Complaint gehört genau einem User (CITIZEN).
+
+Da `User` und `Complaint` eigenständige Aggregate Roots sind, wird der Bürger innerhalb der Beschwerde über seine ID referenziert.
+
+#### 6.2 Beziehung zwischen Complaint und Comment
+
+Eine Beschwerde kann mehrere Kommentare enthalten.
+
+Jeder Kommentar gehört genau einer Beschwerde und ist Teil des Complaint Aggregates.
+
+**Kardinalität:**
+- Eine Complaint kann 0 bis beliebig viele Comments enthalten.
+- Jeder Comment gehört genau einer Complaint.
+
+Die Beziehung wird im UML-Klassendiagramm als Komposition dargestellt.
+
+Kommentare werden über die Methode `Complaint.addComment()` zur Beschwerde hinzugefügt.
+
+Damit kontrolliert die Aggregate Root die Änderungen an den zugehörigen Kommentaren.
+
+#### 6.3 Beziehung zwischen User und Comment
+
+Jeder Kommentar wird von genau einem Verwaltungsmitarbeiter verfasst.
+
+Ein Verwaltungsmitarbeiter kann mehrere Kommentare erstellen.
+
+**Kardinalität:**
+- Ein User (EMPLOYEE) kann 0 bis beliebig viele Comments verfassen.
+- Jeder Comment besitzt genau einen User (EMPLOYEE) als Verfasser.
+
+Die Beziehung erfolgt über das Attribut `authorId` innerhalb der Entity `Comment`.
+
+Da der Benutzer zu einem anderen Aggregate gehört, wird er über seine ID referenziert.
+
+### 7. Konsistenzregeln und Aggregate-Grenzen
+
+Aggregate definieren in Domain-Driven Design fachliche Konsistenzgrenzen.
+
+#### 7.1 User Aggregate
+
+Das User Aggregate verwaltet die Identität und Rolle eines Benutzers.
+
+Folgende Regeln gelten:
+- Jeder Benutzer besitzt eine eindeutige ID.
+- Jeder Benutzer besitzt genau eine gültige Rolle.
+- Passwörter werden nicht im Klartext, sondern als sicherer Hash (`passwordHash`) gespeichert.
+- Die E-Mail-Adresse eines Benutzers muss eindeutig sein. Diese übergreifende Regel wird durch die Anwendungslogik und das Repository sichergestellt.
+
+#### 7.2 Complaint Aggregate
+
+Das Complaint Aggregate verwaltet eine Beschwerde und die zugehörigen Kommentare.
+
+Folgende Regeln gelten:
+- Jede Beschwerde besitzt eine eindeutige ID.
+- Jede Beschwerde gehört genau einem Bürger.
+- Neue Beschwerden beginnen mit dem Status `OPEN`.
+- Es sind ausschließlich die Statuswerte `OPEN`, `IN_PROGRESS` und `RESOLVED` vorgesehen.
+- Statusänderungen erfolgen kontrolliert über `changeStatus()` beziehungsweise `resolve()`.
+- Kommentare werden ausschließlich über `addComment()` hinzugefügt.
+- Ein Kommentar muss einen nicht leeren Text besitzen und einer bestehenden Beschwerde zugeordnet sein.
+
+Die Berechtigungsprüfung erfolgt in der zuständigen Anwendungslogik. Dadurch wird sichergestellt, dass nur Verwaltungsmitarbeiter Statusänderungen durchführen und Kommentare hinzufügen dürfen.
+
+#### 7.3 Kommunikation zwischen den Aggregates
+
+Das User Aggregate und das Complaint Aggregate sollen möglichst unabhängig voneinander bleiben.
+
+Daher werden Benutzer innerhalb der Beschwerden und Kommentare über ihre IDs referenziert.
+
+Die Verknüpfung der Aggregate sowie notwendige Berechtigungsprüfungen erfolgen über die spätere Anwendungslogik.
+
+Dadurch wird eine modulare und testbare Implementierung unterstützt.
+
+### 8. Zusammenfassung
+
+Das Domänenmodell von CityFeedback umfasst die Entities `User`, `Complaint` und `Comment`.
+
+Es wurden zwei Aggregate definiert:
+
+1. **User Aggregate:** Besteht aus der Aggregate Root `User` und gehört zum Identity Context.
+2. **Complaint Aggregate:** Besteht aus der Aggregate Root `Complaint` sowie der untergeordneten Entity `Comment` und gehört zum Complaint Management Context.
+
+Die Enums `UserRole` und `ComplaintStatus` definieren die vorgesehenen Rollen beziehungsweise Zustände.
+
+Die Aggregate-Grenzen ermöglichen eine klare Trennung der Verantwortlichkeiten. Sie bilden die Grundlage für die spätere Definition von Domain Services, Repositories und die Implementierung der Anwendung.
