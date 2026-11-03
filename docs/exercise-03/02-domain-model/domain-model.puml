@@ -1,0 +1,63 @@
+
+@startuml
+
+title CityFeedback - Domaenenmodell
+
+enum UserRole {
+  CITIZEN
+  EMPLOYEE
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+class User {
+  - id : String
+  - name : String
+  - email : String
+  - password : String
+  - role : UserRole
+  --
+  + getRole() : UserRole
+  + isCitizen() : boolean
+  + isEmployee() : boolean
+}
+
+class Complaint {
+  - id : String
+  - citizenId : String
+  - title : String
+  - description : String
+  - category : String
+  - status : ComplaintStatus
+  - createdAt : LocalDateTime
+  --
+  + changeStatus(newStatus : ComplaintStatus) : void
+  + addComment(comment : Comment) : void
+  + resolve() : void
+}
+
+class Comment {
+  - id : String
+  - complaintId : String
+  - authorId : String
+  - text : String
+  - createdAt : LocalDateTime
+}
+
+User "1" --> "0..*" Complaint : erstellt
+User "1" --> "0..*" Comment : verfasst
+Complaint "1" *-- "0..*" Comment : enthaelt
+
+User ..> UserRole : verwendet
+Complaint ..> ComplaintStatus : verwendet
+
+note bottom of User
+  Nur CITIZEN erstellt Beschwerden.
+  Nur EMPLOYEE verfasst Kommentare.
+end note
+
+@enduml
