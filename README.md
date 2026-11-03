@@ -181,22 +181,23 @@ Dieses Event wird ausgelöst, wenn sich ein Benutzer erfolgreich im System anmel
 Dieses Event wird ausgelöst, wenn ein Bürger eine neue Beschwerde erstellt und diese erfolgreich im System gespeichert wurde. Die Beschwerde kann anschließend von der Verwaltung eingesehen und bearbeitet werden.
 
 ### 4. CommentAdded
-Dieses Event wird ausgelöst, wenn ein Bürger oder ein Verwaltungsmitarbeiter einen Kommentar zu einer bestehenden Beschwerde hinzufügt. Dadurch wird die Kommunikation zwischen den Beteiligten dokumentiert.
+Dieses Event wird ausgelöst, wenn ein ein Verwaltungsmitarbeiter einen Kommentar zu einer bestehenden Beschwerde hinzufügt. Dadurch können Details zur Schließung oder weiteren Bearbeitungen festgehalten werden. Der Bürger kann die Kommentare anschließend einsehen.
 
 ### 5. ComplaintStatusChanged
-Dieses Event wird ausgelöst, wenn der Bearbeitungsstatus einer Beschwerde geändert wird. Beispielsweise kann eine Beschwerde von „Neu“ auf „In Bearbeitung“ oder auf „Abgeschlossen“ gesetzt werden. Die Statusänderung ermöglicht es den Beteiligten, den aktuellen Bearbeitungsstand nachzuvollziehen.
+Dieses Event wird ausgelöst, wenn sich der Bearbeitungsstatus einer Beschwerde ändert. Dies kann beispielsweise der Wechsel von „Neu“ zu „In Bearbeitung“ sein. Das Event dokumentiert den aktuellen Fortschritt der Bearbeitung, ohne dass die Beschwerde bereits abgeschlossen sein muss.
 
 ### 6. ComplaintResolved
-Dieses Event wird ausgelöst, wenn eine Beschwerde erfolgreich bearbeitet und als gelöst markiert wurde. Der Status der Beschwerde wird auf „Gelöst“ gesetzt. Dadurch wird dokumentiert, dass das Anliegen des Bürgers abgeschlossen wurde. Gegebenenfalls kann der Bürger anschließend über die Lösung informiert werden.
+Dieses Event wird ausgelöst, wenn die Verwaltung eine Beschwerde erfolgreich bearbeitet und das Anliegen des Bürgers als gelöst betrachtet. Damit ist der Bearbeitungsprozess der Beschwerde abgeschlossen. Das Event kennzeichnet den erfolgreichen Abschluss und kann beispielsweise dazu genutzt werden, den Bürger über die Lösung seines Anliegens zu informieren.
 
 Die Ereignisse zeigen den Lebenszyklus einer Beschwerde von der Erstellung bis zur Lösung:
 
-<img width="1110" height="900" alt="Complaint Management - Event Storming - Übersicht Events" src="https://github.com/user-attachments/assets/42f110e3-2b63-47f9-aafa-179ee550c86c" />
+<img width="1110" height="900" alt="Complaint Management - Event Storming - Übersicht Events (1)" src="https://github.com/user-attachments/assets/b6f4b53a-2be4-4e9d-b3fd-29588c676c01" />
+
 
 Um die zwei wesentlichen Anwendungsfälle (Erstellung einer Beschwerde durch einen "Bürger" & Bearbeitung und Abschluss einer Beschwerde durch einen Verwaltungsmitarbeiter) abzubilden, wurden die Interaktionen bzw. Events in der notwendigen Reihenfolge abgebildet.
 Die Kombination beider Anwendungsfälle stellt den Happy Path unseres Prozesses dar:
 
-<img width="1741" height="574" alt="Complaint Management - Event Storming - Prozess 2 in 1" src="https://github.com/user-attachments/assets/e6415e7b-1105-4561-b9f4-6b4911ef3915" />
+<img width="1741" height="574" alt="Complaint Management - Event Storming - Prozess 2 in 1" src="https://github.com/user-attachments/assets/6a6ff4a6-3e64-4c79-b539-c28e86bdc607" />
 
 ## 02 Domänenmodell
 
@@ -212,21 +213,21 @@ Der Identity Context ist für die Verwaltung der Benutzer zuständig. Dazu gehö
 
 ### Complaint Management Context
 
-Der Complaint Management Context bildet den zentralen Bereich der Anwendung. Er ist für die Erstellung, Verwaltung und Bearbeitung von Beschwerden verantwortlich. Bürger können neue Beschwerden einreichen, während Verwaltungsmitarbeiter diese einsehen und bearbeiten können. Dazu gehört auch die Verwaltung des Beschwerdestatus, beispielsweise von „Neu“ über „In Bearbeitung“ bis hin zu „Gelöst“ (Siehe Abbildung 2 Event Storming).
+Der Complaint Management Context bildet den zentralen Bereich der Anwendung. Er ist für die Erstellung, Verwaltung und Bearbeitung von Beschwerden verantwortlich. Bürger können neue Beschwerden einreichen, während Verwaltungsmitarbeiter diese einsehen und bearbeiten können. Dazu gehört auch die Verwaltung des Beschwerdestatus, beispielsweise von „Offen“ über „In Bearbeitung“ bis hin zu „Erledigt“ (Siehe Abbildung 2 Event Storming).
 
 ### Communication Context
 
 Der Communication Context umfasst die Kommunikation zwischen Bürgern und Verwaltungsmitarbeitern. Benutzer können Kommentare zu bestehenden Beschwerden hinzufügen und dadurch Informationen oder Rückfragen austauschen. Die Kommentare werden der jeweiligen Beschwerde zugeordnet und ermöglichen eine nachvollziehbare Kommunikation über den Bearbeitungsverlauf.
 
-### Notification Context (optional)
+### Notification Context (out of scope)
 
-Der Notification Context ist als mögliche Erweiterung der Anwendung vorgesehen. Seine Aufgabe besteht darin, Benutzer über wichtige Ereignisse zu informieren - ob in-App oder per Mail. Dazu gehören beispielsweise Änderungen des Beschwerdestatus oder neue Kommentare zu einer Beschwerde. Dieser Bereich ist zunächst optional und kann bei Bedarf zu einem späteren Zeitpunkt umgesetzt werden.
+Der Notification Context wird bereits in der Architektur berücksichtigt, die konkrete Implementierung wird jedoch zunächst nachrangig priorisiert. Seine Aufgabe besteht darin, Benutzer über wichtige Ereignisse zu informieren - ob in-App oder per Mail. Dazu gehören beispielsweise Änderungen des Beschwerdestatus oder neue Kommentare zu einer Beschwerde.
 
 ### Darstellung der Bounded Contexts
 
 Die folgende Abbildung zeigt die identifizierten Bounded Contexts und verdeutlicht die Aufteilung der Anwendung in die verschiedenen fachlichen Verantwortungsbereiche sowie deren mögliche Beziehungen zueinander:
 
-<img width="1380" height="724" alt="Complaint Management - Bounded Contexts" src="https://github.com/user-attachments/assets/2aae6675-5170-4517-a81e-bace61b0daa7" />
+<img width="1380" height="724" alt="Complaint Management - Bounded Contexts" src="https://github.com/user-attachments/assets/f0b0f2f6-3f92-4f51-9f2f-650beae28bbc" />
 
 ## 04 Entäten und Aggregate
 
