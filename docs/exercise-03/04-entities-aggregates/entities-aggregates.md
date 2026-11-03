@@ -179,6 +179,81 @@ Die Entity `Comment` wird als untergeordneter Bestandteil des Complaint Aggregat
 
 Andere Komponenten greifen für Änderungen an der Beschwerde und ihren Kommentaren über die Aggregate Root zu. Dadurch bleiben die fachlichen Regeln innerhalb des Aggregates nachvollziehbar und konsistent.
 
+#### 5.3 Comment – Complaint Management Context
+
+**Typ:** Entity innerhalb des Complaint Aggregates
+
+**Bounded Context:** Complaint Management Context
+
+**Aggregate Root:** Complaint
+
+**Beschreibung:**
+
+Die Entity `Comment` repräsentiert einen Kommentar, den ein Mitarbeiter der Stadtverwaltung zu einer bestehenden Beschwerde hinzufügt.
+
+Kommentare dienen dazu, Bürger über die Bearbeitung ihrer Anliegen zu informieren oder zusätzliche Informationen zur Beschwerde festzuhalten.
+
+Jeder Kommentar besitzt eine eindeutige Identität, gehört genau einer Beschwerde und wird von einem Verwaltungsmitarbeiter verfasst.
+
+`Comment` ist keine eigenständige Aggregate Root, sondern wird innerhalb des Complaint Aggregates verwaltet.
+
+**Attribute:**
+
+| Attribut | Datentyp | Beschreibung |
+|---|---|---|
+| id | String | Eindeutige Kommentar-ID |
+| complaintId | String | ID der zugehörigen Beschwerde |
+| authorId | String | ID des Verwaltungsmitarbeiters, der den Kommentar verfasst hat |
+| text | String | Inhalt des Kommentars |
+| createdAt | LocalDateTime | Zeitpunkt der Erstellung |
+
+**Methoden:**
+
+Die Entity `Comment` benötigt im aktuellen Domänenmodell keine eigenen fachlichen Methoden.
+
+Das Hinzufügen eines Kommentars erfolgt über die Aggregate Root `Complaint`:
+
+`Complaint.addComment(comment: Comment)`
+
+Dadurch wird sichergestellt, dass Kommentare ausschließlich im Zusammenhang mit einer bestehenden Beschwerde verwaltet werden.
+
+**Fachliche Regeln:**
+
+- Jeder Kommentar besitzt eine eindeutige ID.
+- Jeder Kommentar gehört genau einer Beschwerde.
+- Ein Kommentar wird von genau einem Verwaltungsmitarbeiter verfasst.
+- Nur Benutzer mit der Rolle `EMPLOYEE` dürfen Kommentare erstellen.
+- Bürger dürfen Kommentare zu ihren eigenen Beschwerden einsehen, aber keine Kommentare hinzufügen.
+- Der Kommentartext darf nicht leer sein.
+- Der Erstellungszeitpunkt wird bei der Erstellung festgelegt.
+- Kommentare werden über die Aggregate Root `Complaint` hinzugefügt.
+- Die Prüfung der Benutzerberechtigung erfolgt vor dem Hinzufügen durch die zuständige Anwendungslogik.
+
+**Beziehungen:**
+
+- Eine `Complaint` kann null bis beliebig viele `Comment`-Objekte enthalten.
+- Jeder `Comment` gehört genau einer `Complaint`.
+- Jeder `Comment` besitzt mit `authorId` eine Referenz auf einen `User` mit der Rolle `EMPLOYEE`.
+- Da `User` ein eigenständiges Aggregate ist, wird der Verfasser über seine ID referenziert.
+
+**Zugehöriges Domain Event:**
+
+`CommentAdded`: Ein Verwaltungsmitarbeiter hat einer bestehenden Beschwerde erfolgreich einen Kommentar hinzugefügt.
+
+Das Event wird fachlich durch das Hinzufügen des Kommentars zum Complaint Aggregate ausgelöst.
+
+Die konkrete technische Erzeugung und Verarbeitung des Events erfolgt in der späteren Implementierung.
+
+**DDD-Einordnung:**
+
+`Comment` ist eine untergeordnete Entity innerhalb des Complaint Aggregates.
+
+Die Aggregate Root `Complaint` kontrolliert das Hinzufügen von Kommentaren und schützt damit die fachlichen Konsistenzregeln.
+
+Ein direkter, unabhängiger Zugriff auf die Entity `Comment` zur Änderung ihres Zustands ist im aktuellen Modell nicht vorgesehen.
+
+Die Zuordnung zu einer Beschwerde erfolgt innerhalb des Aggregates. Die `complaintId` dient dabei der eindeutigen Referenzierung und kann später für die Persistenz verwendet werden.
+
 ### 6. Beziehungen zwischen den Aggregates
 
 Die Beziehungen und Konsistenzregeln werden im weiteren Verlauf dokumentiert.
