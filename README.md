@@ -252,11 +252,135 @@ Konsistenzgrenzen der Aggregate.
 
 
 ## 05 Domain Services und Repositories
+### 05.1 Domain Services
+Für CityFeedback werden zwei Services vorgesehen, die zum Koordinieren der Anwendungsfälle dienen.
 
-------hier ergänzen--------
+#### AuthenticationService (Identity Context)
+Der AuthenticationService gehört zum Identity Context und ist für die Registrierung und Anmeldung von Benutzern zuständig.
 
-## 06  ImplemenEerungsstrategie
+- register(name, email, password, role) – Registriert einen neuen Benutzer.
+- login(email, password) – Überprüft die Anmeldedaten.
 
-------hier ergänzen--------
+#### ComplaintService (Complaint Management Context)
+Der ComplaintService gehört zum Complaint Management Context und koordiniert die Erstellung und Bearbeitung von Beschwerden.
+
+- createComplaint(userId, title, description, category) – Erstellt und speichert eine neue Beschwerde.
+- getComplaintById(id) – Ruft eine Beschwerde anhand ihrer ID ab.
+- getComplaintsByUserId(userId) – Ruft die Beschwerden eines Benutzers ab.
+- changeStatus(complaintId, newStatus) – Ändert den Bearbeitungsstatus.
+- resolveComplaint(complaintId) – Markiert eine Beschwerde als gelöst.
+
+### 05.2 Repositories
+
+Repositories übernehmen die Speicherung und Abfrage der Domänenobjekte.
+
+#### UserRepository (Identity Context)
+Das UserRepository gehört zum Identity Context und verwaltet die Benutzer.
+
+- save(user) – Speichert einen Benutzer.
+- findById(id) – Sucht einen Benutzer anhand seiner ID.
+- findByEmail(email) – Sucht einen Benutzer anhand seiner E-Mail-Adresse.
+
+#### ComplaintRepository (Complaint Management Context)
+Das ComplaintRepository gehört zum Complaint Management Context und verwaltet die Beschwerden.
+
+- save(complaint) – Speichert eine Beschwerde.
+- findById(id) – Sucht eine Beschwerde anhand ihrer ID.
+- findAll() – Ruft alle Beschwerden ab.
+- findByUserId(userId) – Ruft die Beschwerden eines Benutzers ab.
+
+Ein separates CommentRepository ist nicht erforderlich, da Kommentare als untergeordnete Entities zum Complaint-Aggregate gehören und gemeinsam mit der Beschwerde verwaltet werden.
+
+## 06  Implementierungsstrategie
+
+### 06.1 Geplante Projektstruktur
+Die Anwendung wird mit Java und Maven umgesetzt. Die beiden Bounded Contexts Identity und Complaint Management werden jeweils in drei Bereiche unterteilt:
+
+- domain: Entities, Enums, Domain Events und Repository-Schnittstellen.
+- application: Services zur Koordination der Anwendungsfälle.
+- infrastructure: Technische Implementierungen, beispielsweise für die Datenspeicherung.
+
+Vorgeschlagene Package-Struktur:
+
+cityfeedback/
+├── identity/
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+│
+└── complaint/
+    ├── domain/
+    ├── application/
+    └── infrastructure/
+
+### 06.2 Beispiel einer Domain-Klasse
+
+Die Klasse Complaint bildet den Aggregate Root des Complaint-Aggregates. Sie verwaltet die Beschwerdedaten und die zugehörigen Kommentare.
+
+Beispielhafte Java-Implementierung:
+
+public class Complaint {
+
+    private final String id;
+    private final String citizenId;
+    private final String title;
+    private final String description;
+    private final String category;
+    private ComplaintStatus status;
+    private final LocalDateTime createdAt;
+
+    private final List<Comment> comments = new ArrayList<>();
+
+    public Complaint(String id, String citizenId,
+                     String title, String description,
+                     String category) {
+
+        if (title == null || title.trim().length() < 3) {
+            throw new IllegalArgumentException(
+                "Titel muss mindestens 3 Zeichen enthalten.");
+        }
+
+        if (description == null || description.trim().length() < 10) {
+            throw new IllegalArgumentException(
+                "Beschreibung muss mindestens 10 Zeichen enthalten.");
+        }
+
+        if (category == null || category.isBlank()) {
+            throw new IllegalArgumentException(
+                "Kategorie muss angegeben werden.");
+        }
+
+        this.id = id;
+        this.citizenId = citizenId;
+        this.title = title.trim();
+        this.description = description.trim();
+        this.category = category;
+        this.status = ComplaintStatus.OPEN;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void changeStatus(ComplaintStatus newStatus) {
+        this.status = newStatus;
+    }
+
+    public void resolve() {
+        this.status = ComplaintStatus.RESOLVED;
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+    }
+}
+
+Das Beispiel zeigt, dass die Validierung direkt bei der Erstellung erfolgt und Statusänderungen sowie Kommentare über Methoden des Complaint-Aggregates verwaltet werden.
+
+### 06.3 Testbarkeit und Modularität
+
+Für die Umsetzung werden Maven als Build-Tool und JUnit 5 als Testframework verwendet. Die Entwicklung erfolgt nach dem Test-Driven-Development-Prinzip: Zuerst werden Tests geschrieben, anschließend wird die passende Implementierung erstellt und abschließend refaktorisiert. Durch die Trennung der fachlichen Logik von technischen Komponenten können die einzelnen Bereiche unabhängig getestet werden. GitHub Actions führt die automatisierten Tests bei jedem Push und Pull Request aus.
+
+### 06.4 Zusammenfassung
+
+Die gewählte Architektur trennt die fachlichen Verantwortlichkeiten und ermöglicht eine modulare Entwicklung. Das Complaint-Aggregate bildet den Kern der Anwendung. Durch Java, Maven, JUnit 5 und die CI-Pipeline soll CityFeedback wartbar, testbar und erweiterbar bleiben.
+
 
 
