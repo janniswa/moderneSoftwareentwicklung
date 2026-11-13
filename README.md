@@ -217,29 +217,25 @@ Kardinalitäten der wichtigsten Domänenobjekte dar.
 
 ## 03 Bounded Contexts
 
-Um die fachlichen Verantwortlichkeiten innerhalb der Anwendung klar voneinander zu trennen, wird sie in verschiedene Bounded Contexts unterteilt. Jeder Context übernimmt dabei einen bestimmten Aufgabenbereich und enthält die dazugehörige fachliche Logik. Dadurch soll die Komplexität reduziert und eine übersichtliche Softwarearchitektur geschaffen werden.
+Auf Grundlage des erstellten Domänenmodells wird CityFeedback in zwei Bounded Contexts unterteilt. Dadurch werden die fachlichen Verantwortlichkeiten klar voneinander abgegrenzt und die Komplexität der Anwendung reduziert. Die Aufteilung orientiert sich an den im Domänenmodell definierten Entitäten, Aggregates und deren Beziehungen.
 
 ### Identity Context
 
-Der Identity Context ist für die Verwaltung der Benutzer zuständig. Dazu gehören die Registrierung neuer Benutzer sowie die Anmeldung am System. Außerdem werden die verschiedenen Benutzerrollen, beispielsweise Bürger und Verwaltungsmitarbeiter, berücksichtigt. Dieser Context stellt sicher, dass Benutzer identifiziert werden können und Zugriff auf die für sie vorgesehenen Funktionen erhalten.
+Der Identity Context ist für die Verwaltung der Benutzer zuständig. Die zentrale Entity und gleichzeitig der Aggregate Root ist User. Ein Benutzer besitzt Attribute wie eine ID, einen Namen, eine E-Mail-Adresse, einen Passwort-Hash und eine Benutzerrolle. Die Rollen werden durch das Enum UserRole mit den Ausprägungen CITIZEN und EMPLOYEE festgelegt. Der Context ist für die Registrierung und Anmeldung sowie die Verwaltung der Benutzerrollen verantwortlich.
 
 ### Complaint Management Context
 
-Der Complaint Management Context bildet den zentralen Bereich der Anwendung. Er ist für die Erstellung, Verwaltung und Bearbeitung von Beschwerden verantwortlich. Bürger können neue Beschwerden einreichen, während Verwaltungsmitarbeiter diese einsehen und bearbeiten können. Dazu gehört auch die Verwaltung des Beschwerdestatus, beispielsweise von „Offen“ über „In Bearbeitung“ bis hin zu „Erledigt“ (Siehe Abbildung 2 Event Storming).
+Der Complaint Management Context bildet den zentralen fachlichen Bereich von CityFeedback. Die Entity Complaint ist gleichzeitig der Aggregate Root und verwaltet die wesentlichen Informationen einer Beschwerde. Dazu gehören unter anderem Titel, Beschreibung, Kategorie, Status und Erstellungszeitpunkt. Die Entity Comment ist dem Complaint Aggregate untergeordnet und wird direkt einer Beschwerde zugeordnet. Dadurch liegen sowohl die Verwaltung der Beschwerden als auch die zugehörigen Kommentare und Statusänderungen vollständig in diesem Context. Der Beschwerdestatus wird durch das Enum ComplaintStatus mit den Werten OPEN, IN_PROGRESS und RESOLVED abgebildet.
 
-### Communication Context
+### Beziehungen zwischen den Bounded Contexts
 
-Der Communication Context umfasst die Kommunikation zwischen Bürgern und Verwaltungsmitarbeitern. Benutzer können Kommentare zu bestehenden Beschwerden hinzufügen und dadurch Informationen oder Rückfragen austauschen. Die Kommentare werden der jeweiligen Beschwerde zugeordnet und ermöglichen eine nachvollziehbare Kommunikation über den Bearbeitungsverlauf.
-
-### Notification Context (out of scope)
-
-Der Notification Context wird bereits in der Architektur berücksichtigt, die konkrete Implementierung wird jedoch zunächst nachrangig priorisiert. Seine Aufgabe besteht darin, Benutzer über wichtige Ereignisse zu informieren - ob in-App oder per Mail. Dazu gehören beispielsweise Änderungen des Beschwerdestatus oder neue Kommentare zu einer Beschwerde.
+Der Identity Context stellt die Benutzerinformationen und Rollen bereit, die im Complaint Management Context benötigt werden. So kann beispielsweise geprüft werden, ob ein Benutzer als Bürger eine Beschwerde erstellen oder als Mitarbeiter einen Kommentar verfassen darf. Die beiden Contexts besitzen damit klar getrennte Verantwortlichkeiten, arbeiten bei der Zuordnung von Benutzern zu Beschwerden und Kommentaren jedoch zusammen.
 
 ### Darstellung der Bounded Contexts
 
-Die folgende Abbildung zeigt die identifizierten Bounded Contexts und verdeutlicht die Aufteilung der Anwendung in die verschiedenen fachlichen Verantwortungsbereiche sowie deren mögliche Beziehungen zueinander:
+Die folgende Abbildung zeigt die Aufteilung von CityFeedback in den Identity Context und den Complaint Management Context sowie deren fachliche Beziehungen. Die Zuordnung der Kommentare zum Complaint Management Context entspricht dabei der Struktur des erstellten Domänenmodells.
 
-<img width="1380" height="724" alt="Complaint Management - Bounded Contexts" src="https://github.com/user-attachments/assets/f0b0f2f6-3f92-4f51-9f2f-650beae28bbc" />
+insert Link to Image
 
 
 ## 04 Entitäten und Aggregate
