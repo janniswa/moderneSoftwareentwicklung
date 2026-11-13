@@ -189,15 +189,15 @@ Dieses Event wird ausgelöst, wenn sich der Bearbeitungsstatus einer Beschwerde 
 ### 6. ComplaintResolved
 Dieses Event wird ausgelöst, wenn die Verwaltung eine Beschwerde erfolgreich bearbeitet und das Anliegen des Bürgers als gelöst betrachtet. Damit ist der Bearbeitungsprozess der Beschwerde abgeschlossen. Das Event kennzeichnet den erfolgreichen Abschluss und kann beispielsweise dazu genutzt werden, den Bürger über die Lösung seines Anliegens zu informieren.
 
-Die Ereignisse zeigen den Lebenszyklus einer Beschwerde von der Erstellung bis zur Lösung:
+Die Events zeigen den Lebenszyklus einer Beschwerde von der Erstellung bis zur Lösung:
 
 <img width="1110" height="900" alt="Complaint Management - Event Storming - Übersicht Events (1)" src="https://github.com/user-attachments/assets/b6f4b53a-2be4-4e9d-b3fd-29588c676c01" />
 
+Im weiteren Verlauf haben wir die Events den fachlichen Verantwortungsbereichen zugeordnet. Dabei wurde deutlich, dass die Benutzerverwaltung zum Identity Context gehört, während die Erstellung und Bearbeitung von Beschwerden einschließlich der Kommentare dem Complaint Management Context zugeordnet wird.
 
-Um die zwei wesentlichen Anwendungsfälle (Erstellung einer Beschwerde durch einen "Bürger" & Bearbeitung und Abschluss einer Beschwerde durch einen Verwaltungsmitarbeiter) abzubilden, wurden die Interaktionen bzw. Events in der notwendigen Reihenfolge abgebildet.
-Die Kombination beider Anwendungsfälle stellt den Happy Path unseres Prozesses dar:
+Das entstandene Event-Storming-Diagramm veranschaulicht die wichtigsten Abläufe und bildet die Grundlage für unser Domänenmodell sowie die Identifikation der Bounded Contexts.
 
-<img width="1741" height="574" alt="Complaint Management - Event Storming - Prozess 2 in 1" src="https://github.com/user-attachments/assets/6a6ff4a6-3e64-4c79-b539-c28e86bdc607" />
+Bild verlinken
 
 
 ## 02 Domänenmodell
@@ -236,7 +236,7 @@ Der Identity Context stellt die Benutzerinformationen und Rollen bereit, die im 
 Die folgende Abbildung zeigt die Aufteilung von CityFeedback in den Identity Context und den Complaint Management Context sowie deren fachliche Beziehungen. Die Zuordnung der Kommentare zum Complaint Management Context entspricht dabei der Struktur des erstellten Domänenmodells.
 
 insert Link to Image
-
+[Dokumentation: Entities und Aggregates](docs/exercise-03/03-bounded-context/Bounded_Contexts.png)
 
 ## 04 Entitäten und Aggregate
 
