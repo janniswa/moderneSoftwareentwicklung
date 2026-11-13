@@ -1,0 +1,3 @@
+cityfeedback\complaint\domain\Complaint.class
+cityfeedback\complaint\domain\ComplaintTest.class
+cityfeedback\complaint\domain\ComplaintStatus.class
