@@ -191,14 +191,13 @@ Dieses Event wird ausgelöst, wenn die Verwaltung eine Beschwerde erfolgreich be
 
 Die Events zeigen den Lebenszyklus einer Beschwerde von der Erstellung bis zur Lösung:
 
-<img width="1110" height="900" alt="Complaint Management - Event Storming - Übersicht Events (1)" src="https://github.com/user-attachments/assets/b6f4b53a-2be4-4e9d-b3fd-29588c676c01" />
+[Abbildung: Event Storming Eventübersicht](docs/exercise-03/01-event-storming/Event-Storming_Events.png)
 
 Im weiteren Verlauf haben wir die Events den fachlichen Verantwortungsbereichen zugeordnet. Dabei wurde deutlich, dass die Benutzerverwaltung zum Identity Context gehört, während die Erstellung und Bearbeitung von Beschwerden einschließlich der Kommentare dem Complaint Management Context zugeordnet wird.
 
 Das entstandene Event-Storming-Diagramm veranschaulicht die wichtigsten Abläufe und bildet die Grundlage für unser Domänenmodell sowie die Identifikation der Bounded Contexts.
 
-Bild verlinken
-
+[Abbildung: Event Storming Prozess](docs/exercise-03/01-event-storming/Event-Storming_Prozess.png)
 
 ## 02 Domänenmodell
 
@@ -235,8 +234,7 @@ Der Identity Context stellt die Benutzerinformationen und Rollen bereit, die im 
 
 Die folgende Abbildung zeigt die Aufteilung von CityFeedback in den Identity Context und den Complaint Management Context sowie deren fachliche Beziehungen. Die Zuordnung der Kommentare zum Complaint Management Context entspricht dabei der Struktur des erstellten Domänenmodells.
 
-insert Link to Image
-[Dokumentation: Entities und Aggregates](docs/exercise-03/03-bounded-context/Bounded_Contexts.png)
+[Abbildung: Bounded Contexts](docs/exercise-03/03-bounded-context/Bounded_Contexts.png)
 
 ## 04 Entitäten und Aggregate
 
