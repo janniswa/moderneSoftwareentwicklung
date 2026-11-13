@@ -382,5 +382,64 @@ Für die Umsetzung werden Maven als Build-Tool und JUnit 5 als Testframework ver
 
 Die gewählte Architektur trennt die fachlichen Verantwortlichkeiten und ermöglicht eine modulare Entwicklung. Das Complaint-Aggregate bildet den Kern der Anwendung. Durch Java, Maven, JUnit 5 und die CI-Pipeline soll CityFeedback wartbar, testbar und erweiterbar bleiben.
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Übung 4 –  Advanced Java, Test-Driven Design (TDD) und LLM-gestütztes Entwickeln
+
+## 01 LLM Review der Implementierungsstrategie
+
+Für die Überprüfung unserer ursprünglichen Implementierungsstrategie haben wir Claude von Anthropic verwendet. Ziel war es, unsere bisherige Strategie für die Entwicklung der Beschwerdeerstellung kritisch prüfen zu lassen und konkrete Verbesserungsvorschläge im Hinblick auf Domain-Driven Design, Validierung, Domain Events und testgetriebene Entwicklung zu erhalten.
+
+Folgenden Prompt haben wir verwendet
+
+> Wir entwickeln im Rahmen unseres Projekts „CityFeedback“ eine Anwendung, mit der Bürger Beschwerden einreichen und Mitarbeiter der Stadt diese bearbeiten können.
+> Unsere bisherige Architektur basiert auf zwei Bounded Contexts:
+> - Identity Context: Verwaltung von Benutzern und Rollen.
+> - Complaint Management Context: Verwaltung von Beschwerden und deren Status.
+> 
+> Das Aggregate Root im Complaint Management Context ist Complaint. Eine Beschwerde besitzt folgende Attribute: ID, CitizenId, Titel, Beschreibung, Kategorie, Status und Erstellungsdatum. Der initiale Status ist OPEN.
+> Bei der Erstellung einer Beschwerde soll das Domain Event ComplaintCreated entstehen. Die Eingaben Titel, Beschreibung und Kategorie müssen validiert werden.
+> Wir möchten die Anwendung mit Java entwickeln und JUnit 5 für Tests verwenden. Dabei wollen wir testgetrieben vorgehen (TDD).
+> Bitte überprüfe unsere bisherige Implementierungsstrategie kritisch und mache mindestens drei konkrete Verbesserungsvorschläge. Berücksichtige dabei insbesondere:
+> 1. Aufbau und Verantwortlichkeiten des Complaint-Aggregates
+> 2. Validierung der Eingaben
+> 3. Erstellung und Behandlung des Domain Events
+> 4. Testbarkeit und sinnvolle JUnit-Tests
+> 5. Eine geeignete Reihenfolge der Implementierung
+> Begründe deine Vorschläge und erkläre jeweils, welche Vor- und Nachteile sie haben. Berücksichtige, dass wir zunächst nur die Beschwerdeerstellung umsetzen und die Lösung nicht unnötig komplex gestalten möchten.
+
+Als Antwort erhielten wir 5 Verbesserungsvorschläge [vollständige Antwort siehe hier](docs/exercise-04/)
+
+### Kritische Bewertung der fünf Claude-Vorschläge
+
+| Claude-Vorschlag | Bewertung und Entscheidung | Begründung |
+|---|---|---|
+| **1. Factory & Value Objects** | Teilweise übernehmen | Eine einfache Factory-Methode zur Erstellung einer Beschwerde ist sinnvoll. Auf zusätzliche Value Objects und einen aufwendigen Aufbau verzichten wir, da diese für die aktuelle Funktionalität keinen ausreichenden Mehrwert bieten. |
+| **2. Domänenvalidierung** | Übernehmen, aber einfach halten | Die wichtigsten Eingaben wie Titel, Beschreibung und Kategorie werden direkt bei der Erstellung geprüft. Eine aufwendige Validierungslogik oder das gleichzeitige Sammeln mehrerer Fehler ist für unser Projekt nicht notwendig. |
+| **3. Domain Events** | Vereinfachte Umsetzung | Das Event `ComplaintCreated` wird bei erfolgreicher Erstellung berücksichtigt. Auf eine komplexe Event-Veröffentlichung oder ein eigenes Event-System verzichten wir, da zunächst nur die Entstehung des Events gezeigt werden soll. |
+| **4. TDD & Fakes** | TDD übernehmen, Fakes zunächst weglassen | Wir schreiben unsere JUnit-Tests vor der Implementierung und prüfen gültige sowie ungültige Eingaben. Auf Fakes verzichten wir zunächst, da wir bei der Beschwerdeerstellung keine aufwendigen Abhängigkeiten simulieren müssen. |
+| **5. Inside-out-Entwicklung** | Übernehmen | Wir beginnen mit der Domänenlogik und den zugehörigen Tests. Danach ergänzen wir den Application Service. Eine frühzeitige Umsetzung der Infrastruktur ist nicht notwendig. |
 
 
+## 02 Testfälle mit LLM
+
+----insert Content here----
+
+
+## 03 Implementierung Domänenlogik
+
+----insert Content here----
+
+
+## 04 Test Erweiterung und Refaktorisierung
+
+----insert Content here----
+
+
+## 05 Modularität und Testbarkeit via CI/CD sicherstellen
+
+----insert Content here----
+
+
+## 06 Kritische Reflexion
+
+----insert Content here----
