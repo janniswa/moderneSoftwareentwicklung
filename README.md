@@ -191,13 +191,13 @@ Dieses Event wird ausgelöst, wenn die Verwaltung eine Beschwerde erfolgreich be
 
 Die Events zeigen den Lebenszyklus einer Beschwerde von der Erstellung bis zur Lösung:
 
-[Abbildung: Event Storming Eventübersicht](docs/exercise-03/01-event-storming/Event-Storming_Events.png)
+[Abbildung: Event Storming Eventübersicht](docs/exercise-03/01-event-stroming/Event-Storming_Events.png)
 
 Im weiteren Verlauf haben wir die Events den fachlichen Verantwortungsbereichen zugeordnet. Dabei wurde deutlich, dass die Benutzerverwaltung zum Identity Context gehört, während die Erstellung und Bearbeitung von Beschwerden einschließlich der Kommentare dem Complaint Management Context zugeordnet wird.
 
 Das entstandene Event-Storming-Diagramm veranschaulicht die wichtigsten Abläufe und bildet die Grundlage für unser Domänenmodell sowie die Identifikation der Bounded Contexts.
 
-[Abbildung: Event Storming Prozess](docs/exercise-03/01-event-storming/Event-Storming_Prozess.png)
+[Abbildung: Event Storming Prozess](docs/exercise-03/01-event-stroming/Event-Storming_Prozess.png)
 
 ## 02 Domänenmodell
 
