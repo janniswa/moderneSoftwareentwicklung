@@ -407,7 +407,7 @@ Folgenden Prompt haben wir verwendet
 > 5. Eine geeignete Reihenfolge der Implementierung
 > Begründe deine Vorschläge und erkläre jeweils, welche Vor- und Nachteile sie haben. Berücksichtige, dass wir zunächst nur die Beschwerdeerstellung umsetzen und die Lösung nicht unnötig komplex gestalten möchten.
 
-Als Antwort erhielten wir 5 Verbesserungsvorschläge [vollständige Antwort siehe hier](docs/exercise-04/)
+Als Antwort erhielten wir 5 Verbesserungsvorschläge [vollständige Antwort siehe hier](docs/exercise-04/01-llm-analyse/01_Claude_Analyse.pdf)
 
 ### Kritische Bewertung der fünf Claude-Vorschläge
 
@@ -422,7 +422,25 @@ Als Antwort erhielten wir 5 Verbesserungsvorschläge [vollständige Antwort sieh
 
 ## 02 Testfälle mit LLM
 
-----insert Content here----
+### Bewertung der Testfälle mit Claude (JW)
+
+| Nr. | Testfall | Testart | Bewertung | Entscheidung und Begründung |
+|---|---|---|---|---|
+| 1 | `erstelltBeschwerde_mitGueltigenEingaben` | Happy Path | Sehr sinnvoll | Übernehmen. Prüft die grundlegende erfolgreiche Erstellung einer Beschwerde. |
+| 2 | `neueBeschwerde_hatStatusOpen` | Happy Path | Sehr sinnvoll | Übernehmen. Stellt sicher, dass neue Beschwerden automatisch den Status `OPEN` erhalten. |
+| 3 | `neueBeschwerde_setztErstellungsdatumAutomatisch` | Happy Path | Sinnvoll | Übernehmen. Prüft, ob das Erstellungsdatum automatisch gesetzt wird. |
+| 4 | `erfolgreicheErstellung_erzeugtComplaintCreatedEvent` | Happy Path | Sehr sinnvoll | Übernehmen. Prüft, ob bei erfolgreicher Erstellung das Domain Event `ComplaintCreated` entsteht. |
+| 5 | `titel_mitGenau3Zeichen_istGueltig` | Edge Case | Sehr sinnvoll | Übernehmen. Prüft die untere Grenze der erlaubten Titellänge. |
+| 6 | `beschreibung_mitGenau10Zeichen_istGueltig` | Edge Case | Sehr sinnvoll | Übernehmen. Prüft die untere Grenze der erlaubten Beschreibungslänge. |
+| 7 | `kategorie_mitEinemZeichen_istGueltig` | Edge Case | Sinnvoll | Übernehmen. Da keine feste Kategorienliste oder Mindestlänge definiert ist, reicht ein nicht leerer Wert. |
+| 8 | `titel_mitNurLeerzeichenAberLaenge3_istUngueltig` | Edge Case | Sehr sinnvoll | Übernehmen. Verhindert, dass ein Titel trotz ausreichender Länge akzeptiert wird, obwohl er nur aus Leerzeichen besteht. |
+| 9 | `beschreibung_mitNurLeerzeichenAberLaenge10_istUngueltig` | Edge Case | Sehr sinnvoll | Übernehmen. Prüft dieselbe Problematik für die Beschreibung. |
+| 10 | `titel_mitZuWenigZeichen_wirdAbgelehnt` | Negative Test | Sehr sinnvoll | Übernehmen. Prüft, ob Titel unterhalb der Mindestlänge abgelehnt werden. |
+| 11 | `titel_istNullLeerOderBlank_wirdAbgelehnt` | Negative Test | Sehr sinnvoll | Übernehmen. Die verschiedenen Eingaben (`null`, leer, Leerzeichen) werden mit einem parametrisierten Test geprüft. |
+| 12 | `beschreibung_mitZuWenigZeichen_wirdAbgelehnt` | Negative Test | Sehr sinnvoll | Übernehmen. Prüft, ob Beschreibungen unterhalb der Mindestlänge abgelehnt werden. |
+| 13 | `beschreibung_istNullLeerOderBlank_wirdAbgelehnt` | Negative Test | Sehr sinnvoll | Übernehmen. Die verschiedenen ungültigen Eingaben werden parametrisiert getestet. |
+| 14 | `kategorie_istNullLeerOderBlank_wirdAbgelehnt` | Negative Test | Sehr sinnvoll | Übernehmen. Prüft die Pflichtangabe der Kategorie. Eine Prüfung auf bestimmte Kategorien entfällt, da keine Kategorienliste existiert. |
+| 15 | `ungueltigeEingabe_erzeugtKeinEvent` | Negative Test | Teilweise redundant | Zunächst weglassen. Bei einer fehlgeschlagenen Erstellung entsteht kein gültiges Complaint-Objekt. Ein separater Test wäre erst bei einer eigenständigen Event-Verarbeitung sinnvoll. |
 
 
 ## 03 Implementierung Domänenlogik
