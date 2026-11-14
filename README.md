@@ -50,9 +50,47 @@ Die folgenden Befehle gehören zu den wichtigsten Git-Kommandos:
 - `git pull`  
   Lädt Änderungen aus dem Remote-Repository und integriert sie in den aktuellen Branch.
 
-#### Branches und ihre Nutzung
+### Branches und ihre Nutzung
+
+Ein Branch ist ein separater Entwicklungszweig innerhalb eines Git-Repositories. Branches ermöglichen es, unabhängig vom Haupt-Branch (`main`) an neuen Funktionen oder Änderungen zu arbeiten. Dadurch können mehrere Teammitglieder gleichzeitig entwickeln, ohne sich gegenseitig zu beeinflussen.
+
+Wichtige Befehle für die Arbeit mit Branches:
+
+- `git branch` – Zeigt alle lokalen Branches an.
+- `git switch -c feature-name` – Erstellt einen neuen Branch und wechselt direkt dorthin.
+- `git switch main` – Wechselt zurück zum Haupt-Branch.
+- `git push -u origin feature-name` – Überträgt den neuen Branch zum Remote-Repository.
+
+**Typischer Workflow:**
+
+1. Den aktuellen Stand des `main`-Branches mit `git pull` abrufen.
+2. Einen neuen Branch für die geplante Änderung erstellen.
+3. Änderungen durchführen und mit `git add` und `git commit` speichern.
+4. Den Branch mit `git push` zu GitHub übertragen.
+5. Einen Pull Request erstellen, um die Änderungen überprüfen und anschließend zusammenführen zu lassen.
+
 ### Merge
-#### Umgang mit Merge-Konflikten
+
+Beim Merge werden Änderungen aus verschiedenen Branches zusammengeführt. Beispielsweise kann eine fertig entwickelte Funktion aus einem Feature-Branch in den `main`-Branch übernommen werden.
+
+Ein Merge kann lokal mit `git merge <branch-name>` oder direkt über einen Pull Request auf GitHub durchgeführt werden.
+
+In unserem Projekt verwenden wir Pull Requests. Dadurch können Änderungen vor dem Zusammenführen von einem anderen Teammitglied überprüft werden. Nach erfolgreichem Review wird der Branch in den Haupt-Branch gemerged.
+
+### Umgang mit Merge-Konflikten
+
+Ein Merge-Konflikt entsteht, wenn Git Änderungen aus zwei Branches nicht automatisch zusammenführen kann. Dies passiert beispielsweise, wenn zwei Teammitglieder dieselbe Zeile einer Datei unterschiedlich bearbeiten.
+
+**So kann ein Merge-Konflikt gelöst werden:**
+
+1. Mit `git status` prüfen, welche Dateien betroffen sind.
+2. Die betroffenen Dateien öffnen und die widersprüchlichen Änderungen vergleichen.
+3. Entscheiden, welche Änderungen übernommen werden sollen, und die Konfliktmarkierungen entfernen.
+4. Die korrigierten Dateien mit `git add` zur Staging Area hinzufügen.
+5. Den Merge mit `git commit` abschließen, sofern Git nicht bereits einen anderen Abschlussschritt vorgibt.
+
+Merge-Konflikte lassen sich reduzieren, indem Teammitglieder regelmäßig Änderungen abrufen, in eigenen Branches arbeiten und Änderungen frühzeitig über Pull Requests zusammenführen.
+
 ##  Local Repository vs. Remote Repository
 Ein **Local Repository** befindet sich auf dem eigenen Rechner. Änderungen können dort bearbeitet, zur Staging Area hinzugefügt und anschließend mit einem Commit gespeichert werden. Dafür ist keine dauerhafte Internetverbindung notwendig.
 
@@ -78,7 +116,19 @@ Zum Beispiel können:
 - neue Änderungen mit `pull` aus dem Remote-Repository geladen werden.
 
 Die eigentliche Arbeit an den Dateien findet dabei im lokalen Repository statt. GitHub dient als Remote-Repository für den Austausch und die Zusammenarbeit im Team.
+
 ## Plattformen und Tools
+
+Für die Arbeit mit Git gibt es verschiedene Plattformen und Werkzeuge, welche die Versionsverwaltung und Zusammenarbeit erleichtern.
+
+- **GitHub:** Eine Plattform zum Speichern und gemeinsamen Bearbeiten von Git-Repositories. GitHub ermöglicht unter anderem die Verwaltung von Branches, Pull Requests, Code Reviews und Issues.
+- **GitLab:** Eine Alternative zu GitHub mit ähnlichen Funktionen zur Zusammenarbeit und Versionsverwaltung. Zusätzlich bietet GitLab integrierte Möglichkeiten für CI/CD.
+- **Git Bash:** Eine Kommandozeilenumgebung, mit der Git-Befehle insbesondere unter Windows ausgeführt werden können.
+- **GitHub Desktop:** Eine grafische Benutzeroberfläche, über die typische Git-Aktionen wie Commits, Branch-Wechsel und Push/Pull ohne Kommandozeile durchgeführt werden können.
+- **IntelliJ IDEA / PyCharm:** Entwicklungsumgebungen mit integrierter Git-Unterstützung. Sie ermöglichen beispielsweise das Erstellen von Commits, die Verwaltung von Branches und das Synchronisieren mit Remote-Repositories.
+
+Für unser Projekt **CityFeedback** verwenden wir GitHub als zentrale Plattform zur Versionsverwaltung. Die Entwicklung erfolgt in eigenen Branches. Änderungen werden anschließend über Pull Requests überprüft und in den `main`-Branch integriert.
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Übung 2 – CI/CD
 
