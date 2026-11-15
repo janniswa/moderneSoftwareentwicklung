@@ -132,6 +132,24 @@ Für unser Projekt **CityFeedback** verwenden wir GitHub als zentrale Plattform 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Übung 2 – CI/CD
 
+## Grundlagen und Nutzen von CI/CD
+
+**Continuous Integration (CI)** bedeutet, dass Änderungen am Quellcode regelmäßig in ein gemeinsames Repository integriert und automatisch überprüft werden. Beispielsweise kann bei jedem Push oder Pull Request ein automatischer Build gestartet werden. Dadurch lassen sich Integrationsprobleme frühzeitig erkennen.
+
+**Continuous Deployment (CD)** geht einen Schritt weiter. Erfolgreich geprüfte Änderungen können automatisch auf einer Hosting-Plattform bereitgestellt werden, sodass die aktuelle Version der Anwendung verfügbar ist.
+
+### Nutzen für CityFeedback
+
+Für unser Projekt CityFeedback bietet CI/CD folgende Vorteile:
+
+- **Frühzeitige Fehlererkennung:** Probleme beim Zusammenführen von Änderungen können schneller erkannt werden.
+- **Einfachere Zusammenarbeit:** Änderungen der Teammitglieder werden über GitHub und Pull Requests nachvollziehbar integriert.
+- **Automatisierung:** Wiederkehrende Schritte wie das Bauen der Anwendung müssen nicht jedes Mal manuell ausgeführt werden.
+- **Nachvollziehbarkeit:** GitHub Actions dokumentiert die Ergebnisse der Pipeline.
+- **Spätere Erweiterbarkeit:** Die Pipeline kann zukünftig um automatisierte Tests und ein Deployment ergänzt werden.
+
+Aktuell verwenden wir GitHub Actions zur Ausführung unserer CI-Pipeline. Der automatische Build soll im nächsten Schritt integriert werden. Ein automatisches Deployment ist zum jetzigen Zeitpunkt noch nicht umgesetzt.
+
 ## Verwendete CI/CD-Plattform
 
 Für die Continuous-Integration-Pipeline verwenden wir **GitHub Actions**.
