@@ -148,7 +148,7 @@ Für unser Projekt CityFeedback bietet CI/CD folgende Vorteile:
 - **Nachvollziehbarkeit:** GitHub Actions dokumentiert die Ergebnisse der Pipeline.
 - **Spätere Erweiterbarkeit:** Die Pipeline kann zukünftig um automatisierte Tests und ein Deployment ergänzt werden.
 
-Aktuell verwenden wir GitHub Actions zur Ausführung unserer CI-Pipeline. Der automatische Build soll im nächsten Schritt integriert werden. Ein automatisches Deployment ist zum jetzigen Zeitpunkt noch nicht umgesetzt.
+Aktuell verwenden wir GitHub Actions zur Ausführung unserer CI-Pipeline. Der automatische Maven-Build ist erfolgreich in GitHub Actions integriert. Automatisierte Tests und ein Deployment sind für spätere Projektphasen vorgesehen.
 
 ## Verwendete CI/CD-Plattform
 
@@ -164,16 +164,27 @@ Status: ![Java CI](https://github.com/janniswa/moderneSoftwareentwicklung/action
 
 ## Aktueller Ablauf der CI-Pipeline
 
-Die Pipeline wird automatisch ausgeführt, wenn Änderungen in das Repository gepusht werden oder ein Pull Request erstellt beziehungsweise aktualisiert wird.
+Für die automatisierte Continuous Integration verwenden wir GitHub Actions in Verbindung mit Java 17 und Maven.
 
-Der aktuelle Ablauf besteht aus folgenden Schritten:
+Die Pipeline wird automatisch gestartet, wenn Änderungen in das Repository gepusht werden oder ein Pull Request erstellt beziehungsweise aktualisiert wird.
 
-1. GitHub Actions startet automatisch den konfigurierten Workflow.
-2. Das Repository wird auf einem GitHub-Runner ausgecheckt.
-3. Die aktuell konfigurierten CI-Schritte werden ausgeführt.
-4. Das Ergebnis des Workflows kann anschließend direkt über GitHub Actions eingesehen werden.
+Der Ablauf besteht aus folgenden Schritten:
 
-Der automatische Build der CityFeedback-Anwendung ist aktuell noch nicht integriert. Dieser soll ergänzt werden, sobald die konkrete Projekt- und Build-Struktur feststeht.
+1. **Workflow starten:** GitHub Actions erkennt einen Push oder Pull Request und startet automatisch die CI-Pipeline.
+2. **Repository auschecken:** Der aktuelle Quellcode wird mit `actions/checkout` geladen.
+3. **Java einrichten:** Die Entwicklungsumgebung wird mit Java 17 vorbereitet.
+4. **Maven-Build ausführen:** Maven führt im Projektordner `cityfeedback` automatisch den Build-Prozess aus.
+5. **Ergebnis anzeigen:** GitHub Actions zeigt an, ob die Pipeline erfolgreich durchgelaufen ist.
+
+Der Maven-Build wird mit folgendem Befehl ausgeführt:
+
+`mvn -B -Dmaven.test.skip=true package`
+
+Da automatisierte Tests zu diesem Zeitpunkt noch nicht Bestandteil der Übung sind, werden diese beim Build vollständig übersprungen.
+
+Die erfolgreiche Ausführung des automatischen Maven-Builds wurde über GitHub Actions überprüft. Der Workflow wurde erfolgreich abgeschlossen.
+
+Aktuell wird damit der Maven-Build-Prozess automatisiert. Die vollständige Implementierung der CityFeedback-Anwendung erfolgt im weiteren Projektverlauf.
 
 ## Geplante Erweiterungen der CI-Pipeline
 
@@ -181,12 +192,11 @@ Im weiteren Projektverlauf soll die Pipeline schrittweise erweitert werden.
 
 Geplant sind insbesondere:
 
-- automatisches Bauen der CityFeedback-Anwendung,
-- Integration automatisierter Tests,
-- gegebenenfalls weitere Qualitätssicherungsmaßnahmen wie Linting oder Code-Coverage-Auswertungen,
+- Integration automatisierter Tests zur Überprüfung der Anwendungslogik,
+- gegebenenfalls zusätzliche Qualitätssicherungsmaßnahmen wie Linting oder Code-Coverage-Auswertungen,
 - langfristig die Verknüpfung der CI-Pipeline mit einem automatisierten Deployment.
 
-Die automatisierten Tests werden zum aktuellen Stand noch nicht umgesetzt und sollen zu einem späteren Zeitpunkt in die Pipeline integriert werden.
+Ein automatisches Deployment ist zum aktuellen Zeitpunkt noch nicht umgesetzt. Das geplante Deployment-Konzept wird im folgenden Abschnitt beschrieben.
 
 ## Geplantes Deployment-Konzept
 
