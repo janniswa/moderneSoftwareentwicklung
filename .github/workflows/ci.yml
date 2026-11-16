@@ -7,12 +7,21 @@ on:
     branches: ["**"]
 
 jobs:
-  check:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
 
-      - name: Pipeline gestartet
-        run: echo "GitHub Actions funktioniert!"
+      - name: Java 17 einrichten
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+          cache-dependency-path: 'cityfeedback/pom.xml'
+
+      - name: Maven Build ausfuehren
+        working-directory: cityfeedback
+        run: mvn -B -Dmaven.test.skip=true package
