@@ -259,10 +259,10 @@ Dieses Event wird ausgelöst, wenn sich ein Benutzer erfolgreich im System anmel
 Dieses Event wird ausgelöst, wenn ein Bürger eine neue Beschwerde erstellt und diese erfolgreich im System gespeichert wurde. Die Beschwerde kann anschließend von der Verwaltung eingesehen und bearbeitet werden.
 
 ### 4. CommentAdded
-Dieses Event wird ausgelöst, wenn ein ein Verwaltungsmitarbeiter einen Kommentar zu einer bestehenden Beschwerde hinzufügt. Dadurch können Details zur Schließung oder weiteren Bearbeitungen festgehalten werden. Der Bürger kann die Kommentare anschließend einsehen.
+Dieses Event wird ausgelöst, wenn ein Verwaltungsmitarbeiter einen Kommentar zu einer bestehenden Beschwerde hinzufügt. Dadurch können Details zur Schließung oder weiteren Bearbeitung festgehalten werden. Der Bürger kann die Kommentare anschließend einsehen.
 
 ### 5. ComplaintStatusChanged
-Dieses Event wird ausgelöst, wenn sich der Bearbeitungsstatus einer Beschwerde ändert. Dies kann beispielsweise der Wechsel von „Neu“ zu „In Bearbeitung“ sein. Das Event dokumentiert den aktuellen Fortschritt der Bearbeitung, ohne dass die Beschwerde bereits abgeschlossen sein muss.
+Dieses Event wird ausgelöst, wenn sich der Bearbeitungsstatus einer Beschwerde ändert. Dies kann beispielsweise der Wechsel von „Offen“ (`OPEN`) zu „In Bearbeitung“ (`IN_PROGRESS`) sein. Das Event dokumentiert den aktuellen Fortschritt der Bearbeitung, ohne dass die Beschwerde bereits abgeschlossen sein muss.
 
 ### 6. ComplaintResolved
 Dieses Event wird ausgelöst, wenn die Verwaltung eine Beschwerde erfolgreich bearbeitet und das Anliegen des Bürgers als gelöst betrachtet. Damit ist der Bearbeitungsprozess der Beschwerde abgeschlossen. Das Event kennzeichnet den erfolgreichen Abschluss und kann beispielsweise dazu genutzt werden, den Bürger über die Lösung seines Anliegens zu informieren.
@@ -330,23 +330,45 @@ Konsistenzgrenzen der Aggregate.
 
 
 ## 05 Domain Services und Repositories
-### 05.1 Domain Services
-Für CityFeedback werden zwei Services vorgesehen, die zum Koordinieren der Anwendungsfälle dienen.
+
+### 05.1 Services (Anwendungsservices)
+
+Für CityFeedback werden zwei Anwendungsservices vorgesehen,
+die die Abläufe zwischen den Domänenobjekten und Repositories
+koordinieren.
+
+Die eigentlichen fachlichen Regeln werden möglichst direkt
+in den Aggregates umgesetzt. Ein zusätzlicher Domain Service
+ist für die bisherigen Anwendungsfälle nicht erforderlich.
 
 #### AuthenticationService (Identity Context)
-Der AuthenticationService gehört zum Identity Context und ist für die Registrierung und Anmeldung von Benutzern zuständig.
 
-- register(name, email, password, role) – Registriert einen neuen Benutzer.
-- login(email, password) – Überprüft die Anmeldedaten.
+Der AuthenticationService gehört zum Identity Context und
+ist für die Registrierung und Anmeldung von Benutzern zuständig.
+
+- `register(name, email, password, role)` – Registriert einen neuen Benutzer und speichert dessen Passwort ausschließlich als sicheren Hash.
+- `login(email, password)` – Überprüft die Anmeldedaten.
 
 #### ComplaintService (Complaint Management Context)
-Der ComplaintService gehört zum Complaint Management Context und koordiniert die Erstellung und Bearbeitung von Beschwerden.
 
-- createComplaint(userId, title, description, category) – Erstellt und speichert eine neue Beschwerde.
-- getComplaintById(id) – Ruft eine Beschwerde anhand ihrer ID ab.
-- getComplaintsByUserId(userId) – Ruft die Beschwerden eines Benutzers ab.
-- changeStatus(complaintId, newStatus) – Ändert den Bearbeitungsstatus.
-- resolveComplaint(complaintId) – Markiert eine Beschwerde als gelöst.
+Der ComplaintService gehört zum Complaint Management Context
+und koordiniert die Erstellung und Bearbeitung von Beschwerden.
+
+- `createComplaint(userId, title, description, category)` – Erstellt und speichert eine neue Beschwerde.
+- `getComplaintById(id)` – Ruft eine Beschwerde anhand ihrer ID ab.
+- `getComplaintsByUserId(userId)` – Ruft die Beschwerden eines Benutzers ab.
+- `changeStatus(complaintId, newStatus)` – Ändert den Bearbeitungsstatus einer Beschwerde.
+- `resolveComplaint(complaintId)` – Markiert eine Beschwerde als erledigt.
+- `addComment(complaintId, employeeId, text)` – Fügt einer bestehenden Beschwerde einen Kommentar eines Verwaltungsmitarbeiters hinzu.
+
+Der ComplaintService prüft die erforderlichen Berechtigungen,
+lädt die betreffende Beschwerde über das ComplaintRepository,
+ruft die entsprechenden Methoden der Aggregate Root
+`Complaint` auf und speichert anschließend die Änderungen.
+
+Die fachlichen Methoden `changeStatus()`, `resolve()` und
+`addComment()` bleiben dabei innerhalb des Complaint Aggregates.
+
 
 ### 05.2 Repositories
 
@@ -380,6 +402,8 @@ Die Anwendung wird mit Java und Maven umgesetzt. Die beiden Bounded Contexts Ide
 
 Vorgeschlagene Package-Struktur:
 
+
+```text
 cityfeedback/
 ├── identity/
 │   ├── domain/
@@ -390,6 +414,8 @@ cityfeedback/
     ├── domain/
     ├── application/
     └── infrastructure/
+```
+
 
 ### 06.2 Beispiel einer Domain-Klasse
 
@@ -397,6 +423,7 @@ Die Klasse Complaint bildet den Aggregate Root des Complaint-Aggregates. Sie ver
 
 Beispielhafte Java-Implementierung:
 
+```java
 public class Complaint {
 
     private final String id;
@@ -449,6 +476,8 @@ public class Complaint {
         this.comments.add(comment);
     }
 }
+<CodeBlock language="markdown" editable>
+```
 
 Das Beispiel zeigt, dass die Validierung direkt bei der Erstellung erfolgt und Statusänderungen sowie Kommentare über Methoden des Complaint-Aggregates verwaltet werden.
 
@@ -456,7 +485,58 @@ Das Beispiel zeigt, dass die Validierung direkt bei der Erstellung erfolgt und S
 
 Für die Umsetzung werden Maven als Build-Tool und JUnit 5 als Testframework verwendet. Die Entwicklung erfolgt nach dem Test-Driven-Development-Prinzip: Zuerst werden Tests geschrieben, anschließend wird die passende Implementierung erstellt und abschließend refaktorisiert. Durch die Trennung der fachlichen Logik von technischen Komponenten können die einzelnen Bereiche unabhängig getestet werden. GitHub Actions führt die automatisierten Tests bei jedem Push und Pull Request aus.
 
-### 06.4 Zusammenfassung
+
+### 06.4 Geplante Implementierungsreihenfolge
+
+Die Implementierung von CityFeedback erfolgt schrittweise auf
+Grundlage der definierten Domain Events und Bounded Contexts.
+
+Wir beginnen mit der zentralen Domänenlogik und erweitern
+anschließend die Anwendung um weitere Funktionen.
+
+1. **ComplaintCreated – Beschwerde erstellen**
+   - Complaint-Entity mit Validierung implementieren.
+   - Titel, Beschreibung und Kategorie überprüfen.
+   - Automatisierte JUnit-Tests erstellen.
+   - Neue Beschwerden erhalten den Status OPEN.
+
+2. **UserRegistered und UserLoggedIn – Benutzerverwaltung**
+   - User-Entity und UserRole implementieren.
+   - Registrierung und Anmeldung vorbereiten.
+   - Passwörter ausschließlich als sichere Hashes speichern.
+   - Benutzerrollen bei der Anmeldung berücksichtigen.
+
+3. **ComplaintStatusChanged – Statusänderung**
+   - Die Methode changeStatus() implementieren.
+   - Gültige Statuswerte und Statuswechsel überprüfen.
+   - Berechtigungen für Verwaltungsmitarbeiter berücksichtigen.
+   - Passende Unit-Tests erstellen.
+
+4. **CommentAdded – Kommentare hinzufügen**
+   - Comment-Entity implementieren.
+   - Kommentare über Complaint.addComment() hinzufügen.
+   - Sicherstellen, dass nur Verwaltungsmitarbeiter
+     Kommentare erstellen dürfen.
+   - Die Kommentarfunktion mit Unit-Tests absichern.
+
+5. **ComplaintResolved – Beschwerde abschließen**
+   - Die Methode resolve() implementieren.
+   - Den Status auf RESOLVED setzen.
+   - Den fachlichen Abschluss einer Beschwerde abbilden.
+   - Den Abschluss mit Unit-Tests überprüfen.
+
+Die Implementierung erfolgt nach dem TDD-Prinzip:
+Zuerst werden Tests geschrieben, anschließend wird die
+Domänenlogik implementiert und danach bei Bedarf refaktorisiert.
+
+Die Aggregate Roots User und Complaint bilden die Grundlage.
+Repositories und Anwendungsservices werden schrittweise ergänzt,
+um die fachlichen Abläufe miteinander zu verbinden.
+
+Die Benutzeroberfläche wird in einer späteren Projektphase
+entwickelt.
+
+### 06.5 Zusammenfassung
 
 Die gewählte Architektur trennt die fachlichen Verantwortlichkeiten und ermöglicht eine modulare Entwicklung. Das Complaint-Aggregate bildet den Kern der Anwendung. Durch Java, Maven, JUnit 5 und die CI-Pipeline soll CityFeedback wartbar, testbar und erweiterbar bleiben.
 
