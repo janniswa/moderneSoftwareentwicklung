@@ -1,6 +1,9 @@
+
 package cityfeedback.complaint.domain;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 public class Complaint {
 
@@ -12,6 +15,8 @@ public class Complaint {
     private ComplaintStatus status;
     private final LocalDateTime createdAt;
 
+    private final List<ComplaintCreated> domainEvents;
+
     private Complaint(String id, String citizenId, String title,
                       String description, String category) {
 
@@ -22,21 +27,26 @@ public class Complaint {
         this.category = category;
         this.status = ComplaintStatus.OPEN;
         this.createdAt = LocalDateTime.now();
+
+        this.domainEvents = List.of(
+                new ComplaintCreated(this.id, this.createdAt)
+        );
     }
 
     public static Complaint create(String citizenId, String title,
                                    String description, String category) {
 
+        validateText(citizenId, "Bürger-ID", 1);
         validateText(title, "Titel", 3);
         validateText(description, "Beschreibung", 10);
         validateText(category, "Kategorie", 1);
 
         return new Complaint(
-                java.util.UUID.randomUUID().toString(),
-                citizenId,
-                title,
-                description,
-                category
+                UUID.randomUUID().toString(),
+                citizenId.strip(),
+                title.strip(),
+                description.strip(),
+                category.strip()
         );
     }
 
@@ -49,7 +59,7 @@ public class Complaint {
             );
         }
 
-        if (value.length() < minimumLength) {
+        if (value.strip().length() < minimumLength) {
             throw new IllegalArgumentException(
                     fieldName + " muss mindestens "
                     + minimumLength + " Zeichen enthalten."
@@ -57,18 +67,24 @@ public class Complaint {
         }
     }
 
-    public void changeStatus(ComplaintStatus newStatus) {
-        if (newStatus == null) {
-            throw new IllegalArgumentException(
-                    "Der Status darf nicht null sein."
+    public void startProcessing() {
+        if (status != ComplaintStatus.OPEN) {
+            throw new IllegalStateException(
+                    "Nur offene Beschwerden können in Bearbeitung genommen werden."
             );
         }
 
-        this.status = newStatus;
+        status = ComplaintStatus.IN_PROGRESS;
     }
 
     public void resolve() {
-        this.status = ComplaintStatus.RESOLVED;
+        if (status == ComplaintStatus.RESOLVED) {
+            throw new IllegalStateException(
+                    "Die Beschwerde ist bereits gelöst."
+            );
+        }
+
+        status = ComplaintStatus.RESOLVED;
     }
 
     public String getId() {
@@ -97,5 +113,9 @@ public class Complaint {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public List<ComplaintCreated> getDomainEvents() {
+        return domainEvents;
     }
 }

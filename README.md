@@ -387,7 +387,7 @@ Die gewählte Architektur trennt die fachlichen Verantwortlichkeiten und ermögl
 
 ## 01 LLM Review der Implementierungsstrategie
 
-Für die Überprüfung unserer ursprünglichen Implementierungsstrategie haben wir Claude von Anthropic verwendet. Ziel war es, unsere bisherige Strategie für die Entwicklung der Beschwerdeerstellung kritisch prüfen zu lassen und konkrete Verbesserungsvorschläge im Hinblick auf Domain-Driven Design, Validierung, Domain Events und testgetriebene Entwicklung zu erhalten.
+Für die Überprüfung unserer ursprünglichen Implementierungsstrategie haben wir Claude von Anthropic verwendet. Ziel war es, unsere geplante Umsetzung der Beschwerdeerstellung im Complaint Management Context kritisch überprüfen zu lassen und Verbesserungsvorschläge zu erhalten. Claude schlug unter anderem eine Factory-Methode, eine konsequente Domänenvalidierung, die Verwendung von Domain Events sowie eine testgetriebene Entwicklung vor. Diese Vorschläge haben wir bewertet und teilweise übernommen: Die Beschwerde wird nun über eine statische Factory-Methode erstellt, Eingaben werden direkt im Complaint-Aggregat validiert und bei erfolgreicher Erstellung wird das Domain Event `ComplaintCreated` erzeugt. Außerdem haben wir uns für TDD entschieden und zunächst die Tests für die Domänenlogik geschrieben, bevor wir die Implementierung ergänzt haben. Auf zusätzliche Value Objects, Fakes und eine komplexe Event-Architektur haben wir bewusst verzichtet, da diese für den aktuellen Funktionsumfang einen zu großen zusätzlichen Aufwand bedeuten würden.
 
 Folgenden Prompt haben wir verwendet
 
@@ -424,6 +424,8 @@ Als Antwort erhielten wir 5 Verbesserungsvorschläge [vollständige Antwort sieh
 
 ### Bewertung der Testfälle mit Claude (JW)
 
+Für die Entwicklung der ersten Domänenlogik haben wir Claude verwendet, um geeignete JUnit-5-Testfälle für die Erstellung einer Beschwerde zu erarbeiten. Dabei haben wir Happy-Path-, Edge-Case- und Negativtests für die Pflichtfelder, Mindestlängen, den initialen Status, das Erstellungsdatum und das Domain Event `ComplaintCreated` erstellen lassen. Die vorgeschlagenen Testfälle haben wir einzeln bewertet und größtenteils übernommen; auf einen separaten Test für das Ausbleiben eines Events bei ungültigen Eingaben haben wir zunächst verzichtet, da dieser in der aktuellen Implementierung keinen eigenständigen Mehrwert bietet. Zusätzlich haben wir Claude nach geeigneten regulären Ausdrücken für die Eingabevalidierung gefragt. Wir haben uns jedoch gegen reguläre Ausdrücke entschieden, da die Prüfungen mit `isBlank()`, `strip()` und einfachen Längenvergleichen verständlicher und für unsere Anforderungen ausreichend sind. Anschließend haben wir die ausgewählten Tests zuerst implementiert und danach die Beschwerdeerstellung in der Klasse `Complaint` umgesetzt. Im weiteren Verlauf wurden die Tests durch das Refactoring ergänzt und angepasst, sodass zuletzt alle 30 JUnit-Tests erfolgreich durch `mvn test` ausgeführt wurden.
+
 | Nr. | Testfall | Testart | Bewertung | Entscheidung und Begründung |
 |---|---|---|---|---|
 | 1 | `erstelltBeschwerde_mitGueltigenEingaben` | Happy Path | Sehr sinnvoll | Übernehmen. Prüft die grundlegende erfolgreiche Erstellung einer Beschwerde. |
@@ -441,16 +443,41 @@ Als Antwort erhielten wir 5 Verbesserungsvorschläge [vollständige Antwort sieh
 | 13 | `beschreibung_istNullLeerOderBlank_wirdAbgelehnt` | Negative Test | Sehr sinnvoll | Übernehmen. Die verschiedenen ungültigen Eingaben werden parametrisiert getestet. |
 | 14 | `kategorie_istNullLeerOderBlank_wirdAbgelehnt` | Negative Test | Sehr sinnvoll | Übernehmen. Prüft die Pflichtangabe der Kategorie. Eine Prüfung auf bestimmte Kategorien entfällt, da keine Kategorienliste existiert. |
 | 15 | `ungueltigeEingabe_erzeugtKeinEvent` | Negative Test | Teilweise redundant | Zunächst weglassen. Bei einer fehlgeschlagenen Erstellung entsteht kein gültiges Complaint-Objekt. Ein separater Test wäre erst bei einer eigenständigen Event-Verarbeitung sinnvoll. |
+| **16 🆕** | `buergerId_istNull_wirdAbgelehnt` | Negative Test | Sinnvoll | Im weiteren Verlauf ergänzt. Prüft, ob eine Beschwerde ohne Bürger-ID abgelehnt wird. |
+| **17 🆕** | `buergerId_istBlank_wirdAbgelehnt` | Negative Test | Sinnvoll | Im weiteren Verlauf ergänzt. Prüft, ob eine Bürger-ID, die nur aus Leerzeichen besteht, abgelehnt wird. |
+| **18 🆕** | `titel_mitLeerzeichenUndZuWenigZeichen_wirdAbgelehnt` | Edge Case | Sehr sinnvoll | Im weiteren Verlauf ergänzt. Prüft, ob die Mindestlänge auch nach dem Entfernen führender und abschließender Leerzeichen eingehalten wird. |
+| **19 🆕** | `beschreibung_mitLeerzeichenUndZuWenigZeichen_wirdAbgelehnt` | Edge Case | Sehr sinnvoll | Im weiteren Verlauf ergänzt. Prüft dieselbe Problematik für die Beschreibung. |
+| **20 🆕** | `offeneBeschwerde_kannInBearbeitungGenommenWerden` | Happy Path | Sehr sinnvoll | Im weiteren Verlauf ergänzt. Prüft den erlaubten Statusübergang von `OPEN` zu `IN_PROGRESS`. |
+| **21 🆕** | `offeneBeschwerde_kannDirektGeloestWerden` | Happy Path | Sehr sinnvoll | Im weiteren Verlauf ergänzt. Prüft den erlaubten Statusübergang von `OPEN` zu `RESOLVED`. |
+| **22 🆕** | `beschwerdeInBearbeitung_kannGeloestWerden` | Happy Path | Sehr sinnvoll | Im weiteren Verlauf ergänzt. Prüft den erlaubten Statusübergang von `IN_PROGRESS` zu `RESOLVED`. |
+| **23 🆕** | `geloesteBeschwerde_kannNichtErneutGeloestWerden` | Negative Test | Sehr sinnvoll | Im weiteren Verlauf ergänzt. Stellt sicher, dass eine bereits gelöste Beschwerde nicht erneut gelöst werden kann. |
+| **24 🆕** | `neueBeschwerde_hatEineID` | Happy Path | Sinnvoll | Im weiteren Verlauf ergänzt. Prüft, ob bei der Erstellung automatisch eine ID vergeben wird. |
+| **25 🆕** | `zweiBeschwerden_habenUnterschiedlicheIDs` | Edge Case | Sehr sinnvoll | Im weiteren Verlauf ergänzt. Stellt sicher, dass die automatisch generierten IDs eindeutig sind. |
 
 
 ## 03 Implementierung Domänenlogik
+Für die Implementierung der Domänenlogik haben wir zunächst die JUnit-Tests erstellt und anschließend die eigentliche Implementierung vorgenommen. Dadurch haben wir den Test-Driven-Development-Ansatz (TDD) angewendet.
 
-----insert Content here----
+Als erstes haben wir die Enum-Klasse `ComplaintStatus` mit den drei möglichen Statuswerten `OPEN`, `IN_PROGRESS` und `RESOLVED` erstellt. Anschließend wurde die Klasse `Complaint` als Aggregate Root implementiert. Die Erstellung einer neuen Beschwerde erfolgt über die statische Factory-Methode `Complaint.create()`.
+
+Bei der Erstellung werden die Eingaben Titel, Beschreibung und Kategorie validiert. Der Titel muss mindestens drei Zeichen und die Beschreibung mindestens zehn Zeichen enthalten. Die Kategorie darf nicht leer sein. Zusätzlich erhält jede Beschwerde automatisch eine eindeutige UUID, den initialen Status `OPEN` und einen Erstellungszeitpunkt.
+
+Für die Erstellung einer Beschwerde wird außerdem das Domain Event `ComplaintCreated` erzeugt. Dieses enthält die ID der erstellten Beschwerde sowie den Zeitpunkt des Ereignisses. Das Event wird zunächst direkt im Complaint-Aggregat erzeugt und kann über `getDomainEvents()` abgerufen werden.
+
+Die Implementierung wurde anschließend mit Maven und JUnit 5 überprüft. Dabei waren zunächst alle 21 vorhandenen Tests erfolgreich.
 
 
 ## 04 Test Erweiterung und Refaktorisierung
 
-----insert Content here----
+Nach der ersten erfolgreichen Implementierung haben wir die vier Java-Dateien (`Complaint.java`, `ComplaintStatus.java`, `ComplaintCreated.java` und `ComplaintTest.java`) erneut an Claude übergeben, um eine kritische Code-Review durchführen zu lassen. Claude identifizierte dabei unter anderem fehlende Validierungen für die Bürger-ID, ungeschützte Statusübergänge und eine mögliche Umgehung der Mindestlängen durch zusätzliche Leerzeichen.
+
+Diese Verbesserungsvorschläge haben wir bewertet und die für unser Projekt sinnvollen Änderungen übernommen. Die Bürger-ID wird nun ebenfalls validiert und führende sowie abschließende Leerzeichen werden vor der Speicherung entfernt. Außerdem wurden die Statusänderungen durch konkrete Methoden abgesichert: Eine offene Beschwerde kann in Bearbeitung genommen oder direkt gelöst werden, während eine bereits gelöste Beschwerde nicht erneut verändert werden kann.
+
+Zusätzlich haben wir die Klasse `ComplaintCreated` in einen Java-Record umgewandelt, da das Event ausschließlich unveränderliche Daten enthält. Die Tests wurden um die neuen Validierungen und Statusübergänge erweitert. Außerdem haben wir die Teststruktur durch `assertAll()` verbessert und zusätzliche Tests für die automatische Vergabe eindeutiger Beschwerde-IDs ergänzt.
+
+Auf Vorschläge wie die Einführung eines `Clock`-Objekts, zusätzlicher Value Objects oder einer komplexeren Event-Architektur haben wir bewusst verzichtet, da diese für den aktuellen Umfang des Projekts keinen ausreichenden Mehrwert bieten würden.
+
+Nach den Änderungen haben wir die Tests erneut mit `mvn test` ausgeführt. Insgesamt wurden nun 30 Tests erfolgreich ausgeführt, ohne Fehler oder fehlgeschlagene Tests. Damit konnten wir die ursprüngliche Implementierung gezielt verbessern und die wichtigsten fachlichen Anforderungen durch automatisierte Tests absichern.
 
 
 ## 05 Modularität und Testbarkeit via CI/CD sicherstellen
