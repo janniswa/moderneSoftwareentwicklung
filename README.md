@@ -50,9 +50,47 @@ Die folgenden Befehle gehören zu den wichtigsten Git-Kommandos:
 - `git pull`  
   Lädt Änderungen aus dem Remote-Repository und integriert sie in den aktuellen Branch.
 
-#### Branches und ihre Nutzung
+### Branches und ihre Nutzung
+
+Ein Branch ist ein separater Entwicklungszweig innerhalb eines Git-Repositories. Branches ermöglichen es, unabhängig vom Haupt-Branch (`main`) an neuen Funktionen oder Änderungen zu arbeiten. Dadurch können mehrere Teammitglieder gleichzeitig entwickeln, ohne sich gegenseitig zu beeinflussen.
+
+Wichtige Befehle für die Arbeit mit Branches:
+
+- `git branch` – Zeigt alle lokalen Branches an.
+- `git switch -c feature-name` – Erstellt einen neuen Branch und wechselt direkt dorthin.
+- `git switch main` – Wechselt zurück zum Haupt-Branch.
+- `git push -u origin feature-name` – Überträgt den neuen Branch zum Remote-Repository.
+
+**Typischer Workflow:**
+
+1. Den aktuellen Stand des `main`-Branches mit `git pull` abrufen.
+2. Einen neuen Branch für die geplante Änderung erstellen.
+3. Änderungen durchführen und mit `git add` und `git commit` speichern.
+4. Den Branch mit `git push` zu GitHub übertragen.
+5. Einen Pull Request erstellen, um die Änderungen überprüfen und anschließend zusammenführen zu lassen.
+
 ### Merge
-#### Umgang mit Merge-Konflikten
+
+Beim Merge werden Änderungen aus verschiedenen Branches zusammengeführt. Beispielsweise kann eine fertig entwickelte Funktion aus einem Feature-Branch in den `main`-Branch übernommen werden.
+
+Ein Merge kann lokal mit `git merge <branch-name>` oder direkt über einen Pull Request auf GitHub durchgeführt werden.
+
+In unserem Projekt verwenden wir Pull Requests. Dadurch können Änderungen vor dem Zusammenführen von einem anderen Teammitglied überprüft werden. Nach erfolgreichem Review wird der Branch in den Haupt-Branch gemerged.
+
+### Umgang mit Merge-Konflikten
+
+Ein Merge-Konflikt entsteht, wenn Git Änderungen aus zwei Branches nicht automatisch zusammenführen kann. Dies passiert beispielsweise, wenn zwei Teammitglieder dieselbe Zeile einer Datei unterschiedlich bearbeiten.
+
+**So kann ein Merge-Konflikt gelöst werden:**
+
+1. Mit `git status` prüfen, welche Dateien betroffen sind.
+2. Die betroffenen Dateien öffnen und die widersprüchlichen Änderungen vergleichen.
+3. Entscheiden, welche Änderungen übernommen werden sollen, und die Konfliktmarkierungen entfernen.
+4. Die korrigierten Dateien mit `git add` zur Staging Area hinzufügen.
+5. Den Merge mit `git commit` abschließen, sofern Git nicht bereits einen anderen Abschlussschritt vorgibt.
+
+Merge-Konflikte lassen sich reduzieren, indem Teammitglieder regelmäßig Änderungen abrufen, in eigenen Branches arbeiten und Änderungen frühzeitig über Pull Requests zusammenführen.
+
 ##  Local Repository vs. Remote Repository
 Ein **Local Repository** befindet sich auf dem eigenen Rechner. Änderungen können dort bearbeitet, zur Staging Area hinzugefügt und anschließend mit einem Commit gespeichert werden. Dafür ist keine dauerhafte Internetverbindung notwendig.
 
@@ -78,9 +116,39 @@ Zum Beispiel können:
 - neue Änderungen mit `pull` aus dem Remote-Repository geladen werden.
 
 Die eigentliche Arbeit an den Dateien findet dabei im lokalen Repository statt. GitHub dient als Remote-Repository für den Austausch und die Zusammenarbeit im Team.
+
 ## Plattformen und Tools
+
+Für die Arbeit mit Git gibt es verschiedene Plattformen und Werkzeuge, welche die Versionsverwaltung und Zusammenarbeit erleichtern.
+
+- **GitHub:** Eine Plattform zum Speichern und gemeinsamen Bearbeiten von Git-Repositories. GitHub ermöglicht unter anderem die Verwaltung von Branches, Pull Requests, Code Reviews und Issues.
+- **GitLab:** Eine Alternative zu GitHub mit ähnlichen Funktionen zur Zusammenarbeit und Versionsverwaltung. Zusätzlich bietet GitLab integrierte Möglichkeiten für CI/CD.
+- **Git Bash:** Eine Kommandozeilenumgebung, mit der Git-Befehle insbesondere unter Windows ausgeführt werden können.
+- **GitHub Desktop:** Eine grafische Benutzeroberfläche, über die typische Git-Aktionen wie Commits, Branch-Wechsel und Push/Pull ohne Kommandozeile durchgeführt werden können.
+- **IntelliJ IDEA / PyCharm:** Entwicklungsumgebungen mit integrierter Git-Unterstützung. Sie ermöglichen beispielsweise das Erstellen von Commits, die Verwaltung von Branches und das Synchronisieren mit Remote-Repositories.
+
+Für unser Projekt **CityFeedback** verwenden wir GitHub als zentrale Plattform zur Versionsverwaltung. Die Entwicklung erfolgt in eigenen Branches. Änderungen werden anschließend über Pull Requests überprüft und in den `main`-Branch integriert.
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Übung 2 – CI/CD
+
+## Grundlagen und Nutzen von CI/CD
+
+**Continuous Integration (CI)** bedeutet, dass Änderungen am Quellcode regelmäßig in ein gemeinsames Repository integriert und automatisch überprüft werden. Beispielsweise kann bei jedem Push oder Pull Request ein automatischer Build gestartet werden. Dadurch lassen sich Integrationsprobleme frühzeitig erkennen.
+
+**Continuous Deployment (CD)** geht einen Schritt weiter. Erfolgreich geprüfte Änderungen können automatisch auf einer Hosting-Plattform bereitgestellt werden, sodass die aktuelle Version der Anwendung verfügbar ist.
+
+### Nutzen für CityFeedback
+
+Für unser Projekt CityFeedback bietet CI/CD folgende Vorteile:
+
+- **Frühzeitige Fehlererkennung:** Probleme beim Zusammenführen von Änderungen können schneller erkannt werden.
+- **Einfachere Zusammenarbeit:** Änderungen der Teammitglieder werden über GitHub und Pull Requests nachvollziehbar integriert.
+- **Automatisierung:** Wiederkehrende Schritte wie das Bauen der Anwendung müssen nicht jedes Mal manuell ausgeführt werden.
+- **Nachvollziehbarkeit:** GitHub Actions dokumentiert die Ergebnisse der Pipeline.
+- **Spätere Erweiterbarkeit:** Die Pipeline kann zukünftig um automatisierte Tests und ein Deployment ergänzt werden.
+
+Aktuell verwenden wir GitHub Actions zur Ausführung unserer CI-Pipeline. Der automatische Maven-Build ist erfolgreich in GitHub Actions integriert. Automatisierte Tests und ein Deployment sind für spätere Projektphasen vorgesehen.
 
 ## Verwendete CI/CD-Plattform
 
@@ -96,16 +164,27 @@ Status: ![Java CI](https://github.com/janniswa/moderneSoftwareentwicklung/action
 
 ## Aktueller Ablauf der CI-Pipeline
 
-Die Pipeline wird automatisch ausgeführt, wenn Änderungen in das Repository gepusht werden oder ein Pull Request erstellt beziehungsweise aktualisiert wird.
+Für die automatisierte Continuous Integration verwenden wir GitHub Actions in Verbindung mit Java 17 und Maven.
 
-Der aktuelle Ablauf besteht aus folgenden Schritten:
+Die Pipeline wird automatisch gestartet, wenn Änderungen in das Repository gepusht werden oder ein Pull Request erstellt beziehungsweise aktualisiert wird.
 
-1. GitHub Actions startet automatisch den konfigurierten Workflow.
-2. Das Repository wird auf einem GitHub-Runner ausgecheckt.
-3. Die aktuell konfigurierten CI-Schritte werden ausgeführt.
-4. Das Ergebnis des Workflows kann anschließend direkt über GitHub Actions eingesehen werden.
+Der Ablauf besteht aus folgenden Schritten:
 
-Der automatische Build der CityFeedback-Anwendung ist aktuell noch nicht integriert. Dieser soll ergänzt werden, sobald die konkrete Projekt- und Build-Struktur feststeht.
+1. **Workflow starten:** GitHub Actions erkennt einen Push oder Pull Request und startet automatisch die CI-Pipeline.
+2. **Repository auschecken:** Der aktuelle Quellcode wird mit `actions/checkout` geladen.
+3. **Java einrichten:** Die Entwicklungsumgebung wird mit Java 17 vorbereitet.
+4. **Maven-Build ausführen:** Maven führt im Projektordner `cityfeedback` automatisch den Build-Prozess aus.
+5. **Ergebnis anzeigen:** GitHub Actions zeigt an, ob die Pipeline erfolgreich durchgelaufen ist.
+
+Der Maven-Build wird mit folgendem Befehl ausgeführt:
+
+`mvn -B -Dmaven.test.skip=true package`
+
+Da automatisierte Tests zu diesem Zeitpunkt noch nicht Bestandteil der Übung sind, werden diese beim Build vollständig übersprungen.
+
+Die erfolgreiche Ausführung des automatischen Maven-Builds wurde über GitHub Actions überprüft. Der Workflow wurde erfolgreich abgeschlossen.
+
+Aktuell wird damit der Maven-Build-Prozess automatisiert. Die vollständige Implementierung der CityFeedback-Anwendung erfolgt im weiteren Projektverlauf.
 
 ## Geplante Erweiterungen der CI-Pipeline
 
@@ -113,12 +192,11 @@ Im weiteren Projektverlauf soll die Pipeline schrittweise erweitert werden.
 
 Geplant sind insbesondere:
 
-- automatisches Bauen der CityFeedback-Anwendung,
-- Integration automatisierter Tests,
-- gegebenenfalls weitere Qualitätssicherungsmaßnahmen wie Linting oder Code-Coverage-Auswertungen,
+- Integration automatisierter Tests zur Überprüfung der Anwendungslogik,
+- gegebenenfalls zusätzliche Qualitätssicherungsmaßnahmen wie Linting oder Code-Coverage-Auswertungen,
 - langfristig die Verknüpfung der CI-Pipeline mit einem automatisierten Deployment.
 
-Die automatisierten Tests werden zum aktuellen Stand noch nicht umgesetzt und sollen zu einem späteren Zeitpunkt in die Pipeline integriert werden.
+Ein automatisches Deployment ist zum aktuellen Zeitpunkt noch nicht umgesetzt. Das geplante Deployment-Konzept wird im folgenden Abschnitt beschrieben.
 
 ## Geplantes Deployment-Konzept
 
@@ -181,10 +259,10 @@ Dieses Event wird ausgelöst, wenn sich ein Benutzer erfolgreich im System anmel
 Dieses Event wird ausgelöst, wenn ein Bürger eine neue Beschwerde erstellt und diese erfolgreich im System gespeichert wurde. Die Beschwerde kann anschließend von der Verwaltung eingesehen und bearbeitet werden.
 
 ### 4. CommentAdded
-Dieses Event wird ausgelöst, wenn ein ein Verwaltungsmitarbeiter einen Kommentar zu einer bestehenden Beschwerde hinzufügt. Dadurch können Details zur Schließung oder weiteren Bearbeitungen festgehalten werden. Der Bürger kann die Kommentare anschließend einsehen.
+Dieses Event wird ausgelöst, wenn ein Verwaltungsmitarbeiter einen Kommentar zu einer bestehenden Beschwerde hinzufügt. Dadurch können Details zur Schließung oder weiteren Bearbeitung festgehalten werden. Der Bürger kann die Kommentare anschließend einsehen.
 
 ### 5. ComplaintStatusChanged
-Dieses Event wird ausgelöst, wenn sich der Bearbeitungsstatus einer Beschwerde ändert. Dies kann beispielsweise der Wechsel von „Neu“ zu „In Bearbeitung“ sein. Das Event dokumentiert den aktuellen Fortschritt der Bearbeitung, ohne dass die Beschwerde bereits abgeschlossen sein muss.
+Dieses Event wird ausgelöst, wenn sich der Bearbeitungsstatus einer Beschwerde ändert. Dies kann beispielsweise der Wechsel von „Offen“ (`OPEN`) zu „In Bearbeitung“ (`IN_PROGRESS`) sein. Das Event dokumentiert den aktuellen Fortschritt der Bearbeitung, ohne dass die Beschwerde bereits abgeschlossen sein muss.
 
 ### 6. ComplaintResolved
 Dieses Event wird ausgelöst, wenn die Verwaltung eine Beschwerde erfolgreich bearbeitet und das Anliegen des Bürgers als gelöst betrachtet. Damit ist der Bearbeitungsprozess der Beschwerde abgeschlossen. Das Event kennzeichnet den erfolgreichen Abschluss und kann beispielsweise dazu genutzt werden, den Bürger über die Lösung seines Anliegens zu informieren.
@@ -252,23 +330,45 @@ Konsistenzgrenzen der Aggregate.
 
 
 ## 05 Domain Services und Repositories
-### 05.1 Domain Services
-Für CityFeedback werden zwei Services vorgesehen, die zum Koordinieren der Anwendungsfälle dienen.
+
+### 05.1 Services (Anwendungsservices)
+
+Für CityFeedback werden zwei Anwendungsservices vorgesehen,
+die die Abläufe zwischen den Domänenobjekten und Repositories
+koordinieren.
+
+Die eigentlichen fachlichen Regeln werden möglichst direkt
+in den Aggregates umgesetzt. Ein zusätzlicher Domain Service
+ist für die bisherigen Anwendungsfälle nicht erforderlich.
 
 #### AuthenticationService (Identity Context)
-Der AuthenticationService gehört zum Identity Context und ist für die Registrierung und Anmeldung von Benutzern zuständig.
 
-- register(name, email, password, role) – Registriert einen neuen Benutzer.
-- login(email, password) – Überprüft die Anmeldedaten.
+Der AuthenticationService gehört zum Identity Context und
+ist für die Registrierung und Anmeldung von Benutzern zuständig.
+
+- `register(name, email, password, role)` – Registriert einen neuen Benutzer und speichert dessen Passwort ausschließlich als sicheren Hash.
+- `login(email, password)` – Überprüft die Anmeldedaten.
 
 #### ComplaintService (Complaint Management Context)
-Der ComplaintService gehört zum Complaint Management Context und koordiniert die Erstellung und Bearbeitung von Beschwerden.
 
-- createComplaint(userId, title, description, category) – Erstellt und speichert eine neue Beschwerde.
-- getComplaintById(id) – Ruft eine Beschwerde anhand ihrer ID ab.
-- getComplaintsByUserId(userId) – Ruft die Beschwerden eines Benutzers ab.
-- changeStatus(complaintId, newStatus) – Ändert den Bearbeitungsstatus.
-- resolveComplaint(complaintId) – Markiert eine Beschwerde als gelöst.
+Der ComplaintService gehört zum Complaint Management Context
+und koordiniert die Erstellung und Bearbeitung von Beschwerden.
+
+- `createComplaint(userId, title, description, category)` – Erstellt und speichert eine neue Beschwerde.
+- `getComplaintById(id)` – Ruft eine Beschwerde anhand ihrer ID ab.
+- `getComplaintsByUserId(userId)` – Ruft die Beschwerden eines Benutzers ab.
+- `changeStatus(complaintId, newStatus)` – Ändert den Bearbeitungsstatus einer Beschwerde.
+- `resolveComplaint(complaintId)` – Markiert eine Beschwerde als erledigt.
+- `addComment(complaintId, employeeId, text)` – Fügt einer bestehenden Beschwerde einen Kommentar eines Verwaltungsmitarbeiters hinzu.
+
+Der ComplaintService prüft die erforderlichen Berechtigungen,
+lädt die betreffende Beschwerde über das ComplaintRepository,
+ruft die entsprechenden Methoden der Aggregate Root
+`Complaint` auf und speichert anschließend die Änderungen.
+
+Die fachlichen Methoden `changeStatus()`, `resolve()` und
+`addComment()` bleiben dabei innerhalb des Complaint Aggregates.
+
 
 ### 05.2 Repositories
 
@@ -302,6 +402,8 @@ Die Anwendung wird mit Java und Maven umgesetzt. Die beiden Bounded Contexts Ide
 
 Vorgeschlagene Package-Struktur:
 
+
+```text
 cityfeedback/
 ├── identity/
 │   ├── domain/
@@ -312,6 +414,8 @@ cityfeedback/
     ├── domain/
     ├── application/
     └── infrastructure/
+```
+
 
 ### 06.2 Beispiel einer Domain-Klasse
 
@@ -319,6 +423,7 @@ Die Klasse Complaint bildet den Aggregate Root des Complaint-Aggregates. Sie ver
 
 Beispielhafte Java-Implementierung:
 
+```java
 public class Complaint {
 
     private final String id;
@@ -371,6 +476,8 @@ public class Complaint {
         this.comments.add(comment);
     }
 }
+<CodeBlock language="markdown" editable>
+```
 
 Das Beispiel zeigt, dass die Validierung direkt bei der Erstellung erfolgt und Statusänderungen sowie Kommentare über Methoden des Complaint-Aggregates verwaltet werden.
 
@@ -378,7 +485,58 @@ Das Beispiel zeigt, dass die Validierung direkt bei der Erstellung erfolgt und S
 
 Für die Umsetzung werden Maven als Build-Tool und JUnit 5 als Testframework verwendet. Die Entwicklung erfolgt nach dem Test-Driven-Development-Prinzip: Zuerst werden Tests geschrieben, anschließend wird die passende Implementierung erstellt und abschließend refaktorisiert. Durch die Trennung der fachlichen Logik von technischen Komponenten können die einzelnen Bereiche unabhängig getestet werden. GitHub Actions führt die automatisierten Tests bei jedem Push und Pull Request aus.
 
-### 06.4 Zusammenfassung
+
+### 06.4 Geplante Implementierungsreihenfolge
+
+Die Implementierung von CityFeedback erfolgt schrittweise auf
+Grundlage der definierten Domain Events und Bounded Contexts.
+
+Wir beginnen mit der zentralen Domänenlogik und erweitern
+anschließend die Anwendung um weitere Funktionen.
+
+1. **ComplaintCreated – Beschwerde erstellen**
+   - Complaint-Entity mit Validierung implementieren.
+   - Titel, Beschreibung und Kategorie überprüfen.
+   - Automatisierte JUnit-Tests erstellen.
+   - Neue Beschwerden erhalten den Status OPEN.
+
+2. **UserRegistered und UserLoggedIn – Benutzerverwaltung**
+   - User-Entity und UserRole implementieren.
+   - Registrierung und Anmeldung vorbereiten.
+   - Passwörter ausschließlich als sichere Hashes speichern.
+   - Benutzerrollen bei der Anmeldung berücksichtigen.
+
+3. **ComplaintStatusChanged – Statusänderung**
+   - Die Methode changeStatus() implementieren.
+   - Gültige Statuswerte und Statuswechsel überprüfen.
+   - Berechtigungen für Verwaltungsmitarbeiter berücksichtigen.
+   - Passende Unit-Tests erstellen.
+
+4. **CommentAdded – Kommentare hinzufügen**
+   - Comment-Entity implementieren.
+   - Kommentare über Complaint.addComment() hinzufügen.
+   - Sicherstellen, dass nur Verwaltungsmitarbeiter
+     Kommentare erstellen dürfen.
+   - Die Kommentarfunktion mit Unit-Tests absichern.
+
+5. **ComplaintResolved – Beschwerde abschließen**
+   - Die Methode resolve() implementieren.
+   - Den Status auf RESOLVED setzen.
+   - Den fachlichen Abschluss einer Beschwerde abbilden.
+   - Den Abschluss mit Unit-Tests überprüfen.
+
+Die Implementierung erfolgt nach dem TDD-Prinzip:
+Zuerst werden Tests geschrieben, anschließend wird die
+Domänenlogik implementiert und danach bei Bedarf refaktorisiert.
+
+Die Aggregate Roots User und Complaint bilden die Grundlage.
+Repositories und Anwendungsservices werden schrittweise ergänzt,
+um die fachlichen Abläufe miteinander zu verbinden.
+
+Die Benutzeroberfläche wird in einer späteren Projektphase
+entwickelt.
+
+### 06.5 Zusammenfassung
 
 Die gewählte Architektur trennt die fachlichen Verantwortlichkeiten und ermöglicht eine modulare Entwicklung. Das Complaint-Aggregate bildet den Kern der Anwendung. Durch Java, Maven, JUnit 5 und die CI-Pipeline soll CityFeedback wartbar, testbar und erweiterbar bleiben.
 
