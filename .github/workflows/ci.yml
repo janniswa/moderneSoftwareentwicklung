@@ -24,4 +24,4 @@ jobs:
 
       - name: Maven Build ausfuehren
         working-directory: cityfeedback
-        run: mvn -B -Dmaven.test.skip=true package
+        run: mvn -B clean verify
