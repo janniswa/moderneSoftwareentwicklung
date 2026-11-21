@@ -186,10 +186,6 @@ Die erfolgreiche Ausführung wurde über GitHub Actions überprüft. Dabei wurde
 
 Damit werden sowohl der Maven-Build als auch die automatisierten Tests über die CI-Pipeline ausgeführt. Die weitere Implementierung der CityFeedback-Anwendung erfolgt im weiteren Projektverlauf.
 
-Die erfolgreiche Ausführung des automatischen Maven-Builds wurde über GitHub Actions überprüft. Der Workflow wurde erfolgreich abgeschlossen.
-
-Aktuell wird damit der Maven-Build-Prozess automatisiert. Die vollständige Implementierung der CityFeedback-Anwendung erfolgt im weiteren Projektverlauf.
-
 ## Geplante Erweiterungen der CI-Pipeline
 
 Im weiteren Projektverlauf soll die Pipeline schrittweise erweitert werden.
@@ -480,7 +476,6 @@ public class Complaint {
         this.comments.add(comment);
     }
 }
-<CodeBlock language="markdown" editable>
 ```
 
 Das Beispiel zeigt, dass die Validierung direkt bei der Erstellung erfolgt und Statusänderungen sowie Kommentare über Methoden des Complaint-Aggregates verwaltet werden.
