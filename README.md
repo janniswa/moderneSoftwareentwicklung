@@ -632,7 +632,16 @@ Nach den Änderungen haben wir die Tests erneut mit `mvn test` ausgeführt. Insg
 
 ## 05 Modularität und Testbarkeit via CI/CD sicherstellen
 
-----insert Content here----
+Unsere Anwendung CityFeedback wurde in Übung 3 in die beiden Bounded Contexts Identity und Complaint Management unterteilt.
+In Übung 4 haben wir zunächst den zentralen Bereich Complaint Management implementiert, während Identity weiterhin Bestandteil der geplanten Architektur ist.
+Der implementierte Code befindet sich im Paket `cityfeedback.complaint.domain` und besteht aus den Klassen `Complaint`, `ComplaintStatus` und dem Domain Event `ComplaintCreated`. Die Klasse `Complaint` dient als Aggregate Root und kapselt die fachlichen Regeln für die Erstellung und Statusänderung einer Beschwerde.
+Die Validierungen werden direkt in der Domäne durchgeführt, sodass ungültige Eingaben frühzeitig abgefangen werden.
+Zwischen den Bounded Contexts bestehen derzeit keine direkten Codeabhängigkeiten, da Beschwerden ihren Ersteller lediglich über die `citizenId` referenzieren.
+Die Domänenlogik ist unabhängig von Datenbanken und Webframeworks und kann deshalb mit JUnit 5 getestet werden.
+Repository-Interfaces und Application Services sind für den späteren Ausbau vorgesehen.
+Für die automatische Testausführung verwenden wir GitHub Actions mit Java 17 und Maven, wobei der Befehl `mvn -B clean verify` bei Pushes und Pull Requests den Build und die Tests startet.
+Die zuvor deaktivierte Testausführung wurde für Übung 4 aktiviert, damit Codeänderungen automatisch überprüft werden.
+Der erfolgreiche GitHub-Actions-Durchlauf bestätigt, dass alle 30 JUnit-Tests ohne Fehler ausgeführt wurden und der Maven-Build erfolgreich abgeschlossen wurde.
 
 
 ## 06 Kritische Reflexion
