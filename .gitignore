@@ -6,3 +6,6 @@ out/
 # Windows
 Thumbs.db
 Desktop.ini
+
+# Maven Build-Dateien ignorieren
+cityfeedback/target/
