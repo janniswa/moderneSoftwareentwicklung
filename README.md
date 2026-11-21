@@ -146,9 +146,9 @@ Für unser Projekt CityFeedback bietet CI/CD folgende Vorteile:
 - **Einfachere Zusammenarbeit:** Änderungen der Teammitglieder werden über GitHub und Pull Requests nachvollziehbar integriert.
 - **Automatisierung:** Wiederkehrende Schritte wie das Bauen der Anwendung müssen nicht jedes Mal manuell ausgeführt werden.
 - **Nachvollziehbarkeit:** GitHub Actions dokumentiert die Ergebnisse der Pipeline.
-- **Spätere Erweiterbarkeit:** Die Pipeline kann zukünftig um automatisierte Tests und ein Deployment ergänzt werden.
+- **Spätere Erweiterbarkeit:** Die Pipeline kann zukünftig um zusätzliche Qualitätssicherungsmaßnahmen und ein automatisches Deployment erweitert werden.
 
-Aktuell verwenden wir GitHub Actions zur Ausführung unserer CI-Pipeline. Der automatische Maven-Build ist erfolgreich in GitHub Actions integriert. Automatisierte Tests und ein Deployment sind für spätere Projektphasen vorgesehen.
+Wir verwenden GitHub Actions zur Ausführung unserer CI-Pipeline. Neben dem automatischen Maven-Build werden seit Übung 4 auch die vorhandenen JUnit-Tests automatisch ausgeführt. Ein automatisches Deployment ist für eine spätere Projektphase vorgesehen.
 
 ## Verwendete CI/CD-Plattform
 
@@ -173,14 +173,18 @@ Der Ablauf besteht aus folgenden Schritten:
 1. **Workflow starten:** GitHub Actions erkennt einen Push oder Pull Request und startet automatisch die CI-Pipeline.
 2. **Repository auschecken:** Der aktuelle Quellcode wird mit `actions/checkout` geladen.
 3. **Java einrichten:** Die Entwicklungsumgebung wird mit Java 17 vorbereitet.
-4. **Maven-Build ausführen:** Maven führt im Projektordner `cityfeedback` automatisch den Build-Prozess aus.
+4. **Maven-Build und Tests ausführen:** Maven kompiliert den Java-Code im Projektordner cityfeedback und führt anschließend die vorhandenen JUnit-Tests automatisch aus.
 5. **Ergebnis anzeigen:** GitHub Actions zeigt an, ob die Pipeline erfolgreich durchgelaufen ist.
 
 Der Maven-Build wird mit folgendem Befehl ausgeführt:
 
-`mvn -B -Dmaven.test.skip=true package`
+`mvn -B clean verify`
 
-Da automatisierte Tests zu diesem Zeitpunkt noch nicht Bestandteil der Übung sind, werden diese beim Build vollständig übersprungen.
+Seit Übung 4 werden die vorhandenen JUnit-Tests beim Maven-Build automatisch ausgeführt. Hierfür verwenden wir den Befehl `mvn -B clean verify`.
+
+Die erfolgreiche Ausführung wurde über GitHub Actions überprüft. Dabei wurden alle 30 JUnit-Tests erfolgreich abgeschlossen (0 Fehler, 0 fehlgeschlagene Tests, 0 übersprungene Tests). Der Workflow endete mit `BUILD SUCCESS`.
+
+Damit werden sowohl der Maven-Build als auch die automatisierten Tests über die CI-Pipeline ausgeführt. Die weitere Implementierung der CityFeedback-Anwendung erfolgt im weiteren Projektverlauf.
 
 Die erfolgreiche Ausführung des automatischen Maven-Builds wurde über GitHub Actions überprüft. Der Workflow wurde erfolgreich abgeschlossen.
 
@@ -192,7 +196,7 @@ Im weiteren Projektverlauf soll die Pipeline schrittweise erweitert werden.
 
 Geplant sind insbesondere:
 
-- Integration automatisierter Tests zur Überprüfung der Anwendungslogik,
+- Erweiterung der bestehenden automatisierten JUnit-Tests bei neuen Funktionen,
 - gegebenenfalls zusätzliche Qualitätssicherungsmaßnahmen wie Linting oder Code-Coverage-Auswertungen,
 - langfristig die Verknüpfung der CI-Pipeline mit einem automatisierten Deployment.
 
