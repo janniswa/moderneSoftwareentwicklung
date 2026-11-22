@@ -586,7 +586,7 @@ Als Antwort erhielten wir 5 Verbesserungsvorschläge [vollständige Antwort sieh
 
 ## 02 Testfälle mit LLM
 
-### Bewertung der Testfälle mit Claude (JW)
+### Bewertung der Testfälle mit LLM
 
 Für die Entwicklung der ersten Domänenlogik haben wir Claude verwendet, um geeignete JUnit-5-Testfälle für die Erstellung einer Beschwerde zu erarbeiten.
 Dabei haben wir Happy-Path-, Edge-Case- und Negativtests für die Pflichtfelder, Mindestlängen, den initialen Status, das Erstellungsdatum und das Domain Event `ComplaintCreated` erstellen lassen.
@@ -696,3 +696,178 @@ Eine wesentliche Grenze von LLMs besteht darin, dass sie fehlerhaften, unnötig 
 Unserer Erfahrung nach eignen sich LLMs besonders gut für Testideen, die Erklärung von Java-Techniken und einfache Refactoring-Vorschläge, während fachliche Architekturentscheidungen und die endgültige Bewertung der Codequalität weiterhin von uns selbst getroffen werden müssen.
 
 Insgesamt hat die Kombination aus TDD, DDD und LLM-Unterstützung unsere Entwicklung strukturierter und nachvollziehbarer gemacht, was auch durch die erfolgreiche automatische Ausführung aller 30 JUnit-Tests in unserer GitHub-Actions-Pipeline bestätigt wurde.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Übung 5 –  Software- und Architekturmetriken für Codequalität und Architekturopmierung
+
+## 01 Überblick und Anwendung einfacher Metriken
+
+### 1.1 Verwendetes Werkzeug
+
+Für die Analyse der Codequalität wurde die VS-Code-Erweiterung **Java Metrics** verwendet. Untersucht wurden die drei Java-Dateien des Complaint Managements:
+
+- `Complaint.java`
+- `ComplaintCreated.java`
+- `ComplaintStatus.java`
+
+Dabei wurden die Lines of Code (LOC) sowie verschiedene Halstead-Metriken ermittelt. Die Anzahl der Methoden und Parameter wurde zusätzlich manuell erfasst.
+
+### 1.2 Ergebnisse der Metrikanalyse
+
+| Metrik | Complaint.java | ComplaintCreated.java | ComplaintStatus.java |
+|---|---:|---:|---:|
+| Lines of Code inkl. Kommentare | 95 | 19 | 6 |
+| Lines of Code exkl. Kommentare | 95 | 19 | 6 |
+| Halstead Length | 372 | 49 | 13 |
+| Halstead Vocabulary | 77 | 24 | 11 |
+| Halstead Volume | 2.331,245 | 224,663 | 44,973 |
+| Halstead Difficulty | 23,375 | 7,143 | 2 |
+
+Für die Datei `Complaint.java` wurden zusätzlich folgende Werte manuell ermittelt:
+
+| Merkmal | Anzahl |
+|---|---:|
+| Methoden (ohne Konstruktor) | 12 |
+| Konstruktoren | 1 |
+| Parameter insgesamt | 12 |
+
+### 1.3 Interpretation der Ergebnisse
+
+Die Messwerte zeigen, dass die Datei `Complaint.java` mit 95 Codezeilen den größten Umfang und die höchsten Halstead-Werte aufweist. Sie enthält den größten Teil der Geschäftslogik, darunter die Erstellung und Validierung von Beschwerden sowie die Verwaltung der Statusänderungen.
+
+Die Datei `ComplaintCreated.java` umfasst 19 Codezeilen. Sie enthält die Definition des Domain Events und zwei Validierungsprüfungen.
+
+Die Datei `ComplaintStatus.java` ist mit sechs Codezeilen die kleinste der untersuchten Dateien. Sie definiert die drei möglichen Beschwerdestatus `OPEN`, `IN_PROGRESS` und `RESOLVED`.
+
+Insgesamt konzentrieren sich Umfang und strukturelle Komplexität auf `Complaint.java`. Die beiden anderen Dateien weisen deutlich niedrigere Messwerte auf.
+
+### 1.4 LLM-gestützte Bewertung und Verbesserungsvorschläge
+
+Anschließend wurde Claude zur Bewertung der Messergebnisse und zur Identifikation möglicher Verbesserungen herangezogen. Dabei wurden folgende Vorschläge betrachtet:
+
+**1. Validierungslogik weiter vereinfachen**
+
+Die Validierung der Eingaben erfolgt bereits zentral über die Methode `validateText()`. Dadurch wird redundanter Code vermieden und die Mindestlängenprüfung einheitlich umgesetzt.
+
+Bewertung: Die bestehende Umsetzung ist sinnvoll. Eine weitere Aufteilung würde die Struktur möglicherweise unnötig komplizieren. Der Vorschlag wurde daher nicht umgesetzt.
+
+**2. Zeitverwaltung testbarer gestalten**
+
+Der Erstellungszeitpunkt wird aktuell direkt über `LocalDateTime.now()` gesetzt. Eine alternative Möglichkeit wäre die Verwendung einer injizierbaren `Clock`, wodurch sich Zeitpunkte in Tests gezielter kontrollieren ließen.
+
+Bewertung: Diese Verbesserung könnte die Testbarkeit erhöhen. Für den aktuellen Projektumfang ist sie jedoch nicht zwingend notwendig, da die vorhandenen Tests bereits überprüfen, ob der Erstellungszeitpunkt korrekt gesetzt wird. Der Vorschlag wurde zunächst nicht umgesetzt.
+
+**3. Statusänderungen klarer strukturieren**
+
+Die Statusänderungen werden über die Methoden `startProcessing()` und `resolve()` umgesetzt. Ungültige Zustandsübergänge werden durch entsprechende Prüfungen verhindert.
+
+Bewertung: Die bestehende Umsetzung ist bereits gut nachvollziehbar. Eine zusätzliche Datei zur Statusverwaltung wäre für den aktuellen Projektumfang überdimensioniert. Der Vorschlag wurde daher nicht umgesetzt.
+
+### 1.5 Fazit
+
+Die Metrikanalyse zeigt, dass sich der größte Umfang und die höchste strukturelle Komplexität auf die Datei `Complaint.java` konzentrieren. Die beiden anderen Dateien sind deutlich kleiner und erfüllen klar abgegrenzte Aufgaben.
+
+Die LLM-Vorschläge wurden kritisch geprüft und hinsichtlich ihres tatsächlichen Nutzens bewertet. Dabei wurde festgestellt, dass die vorhandene Implementierung bereits eine sinnvolle Struktur aufweist. Größere strukturelle Änderungen sind zum aktuellen Zeitpunkt nicht erforderlich.
+
+Es wurden deshalb im Rahmen dieser Analyse keine Änderungen am Quellcode vorgenommen. Die Ergebnisse dienen als Ausgangspunkt für die weitere Untersuchung der Testabdeckung und der technischen Schulden.
+
+## 02 Test Coverage erweitern und Code Coverage verbessern
+
+### 2.1 Einrichtung und erste Messung
+
+Zur Messung der Testabdeckung wurde das Maven-Plugin **JaCoCo** in die `pom.xml` eingebunden. Das Plugin erstellt während der Testausführung einen Coverage-Bericht, der über `target/site/jacoco/index.html` im Browser geöffnet werden kann.
+
+Bei der ersten Messung ergaben sich folgende Werte:
+
+| Metrik | Testabdeckung |
+|---|---:|
+| Instruction Coverage | 94 % |
+| Branch Coverage | 81 % |
+
+Damit wurde das angestrebte Ziel von mindestens 80 % bereits erreicht. Bei der genaueren Betrachtung der einzelnen Dateien fiel jedoch auf, dass `Complaint.java` und `ComplaintStatus.java` bereits vollständig abgedeckt waren, während `ComplaintCreated.java` lediglich 61 % Instruction Coverage und 50 % Branch Coverage erreichte.
+
+### 2.2 Analyse und zusätzliche Testfälle mit LLM
+
+Zur Verbesserung der Testabdeckung wurde ein LLM zur Analyse der noch nicht abgedeckten Stellen herangezogen. Dabei wurde festgestellt, dass insbesondere die Validierungen in `ComplaintCreated.java` noch nicht vollständig durch negative Tests überprüft wurden.
+
+Das LLM schlug drei zusätzliche Testfälle vor:
+
+1. Die Beschwerde-ID (`complaintId`) ist `null`.
+2. Die Beschwerde-ID besteht nur aus Leerzeichen.
+3. Der Ereigniszeitpunkt (`occurredAt`) ist `null`.
+
+Diese Fälle überprüfen, ob bei ungültigen Eingaben jeweils eine `IllegalArgumentException` ausgelöst wird.
+
+### 2.3 Umsetzung der zusätzlichen Tests
+
+Die drei vorgeschlagenen Testfälle wurden mit JUnit 5 umgesetzt. Dafür wurde eine neue Testdatei namens `ComplaintCreatedTest.java` angelegt.
+
+Die Entscheidung für eine separate Testdatei erfolgte bewusst: `ComplaintTest.java` enthält die Tests für `Complaint.java`, während `ComplaintCreatedTest.java` gezielt die Validierungen von `ComplaintCreated.java` überprüft. Dadurch bleiben die Tests thematisch getrennt und übersichtlich. Technisch wäre es ebenfalls möglich gewesen, alle Tests in der bestehenden Testdatei unterzubringen. Die Aufteilung wurde jedoch zugunsten einer besseren Struktur und Wartbarkeit gewählt.
+
+Anschließend wurden die Tests mit dem Befehl `mvn clean verify` ausgeführt. Der Build wurde erfolgreich abgeschlossen.
+
+### 2.4 Abschließende Messung und Ergebnis
+
+Nach der Ergänzung der drei Testfälle wurde der JaCoCo-Bericht erneut erstellt und ausgewertet. Die abschließende Messung ergab folgende Werte:
+
+| Datei | Instruction Coverage | Branch Coverage |
+|---|---:|---:|
+| `ComplaintCreated.java` | 100 % | 100 % |
+| `Complaint.java` | 100 % | 100 % |
+| `ComplaintStatus.java` | 100 % | n/a |
+| **Gesamt** | **100 %** | **100 %** |
+
+Durch die zusätzlichen Tests konnten sämtliche zuvor nicht abgedeckten Stellen erreicht werden. Sowohl die Instruction Coverage als auch die Branch Coverage liegen nun bei 100 %.
+
+### 2.5 Fazit
+
+Die Verwendung von JaCoCo ermöglichte es, bisher nicht getestete Stellen gezielt zu identifizieren. Die vom LLM vorgeschlagenen zusätzlichen Testfälle waren sinnvoll und konnten erfolgreich umgesetzt werden. Besonders hilfreich war dabei die getrennte Betrachtung der einzelnen Dateien, wodurch die fehlende Testabdeckung in `ComplaintCreated.java` schnell lokalisiert werden konnte. Das angestrebte Ziel von mindestens 80 % wurde deutlich übertroffen. Die abschließende Testabdeckung beträgt sowohl bei den Instruktionen als auch bei den Verzweigungen 100 %.
+
+## 03 Technical Debt und Regelverletzungen mit LLM analysieren
+
+### 3.1 Vorgehensweise
+
+Zur Untersuchung der technischen Schulden wurden die drei vorhandenen Produktionsdateien `Complaint.java`, `ComplaintCreated.java` und `ComplaintStatus.java` manuell analysiert. Zusätzlich wurde ein LLM eingesetzt, um mögliche Code-Duplikate, unnötige Komplexität, Wartungsprobleme und Verbesserungsmöglichkeiten zu identifizieren.
+
+Die Analyse konzentrierte sich auf die Lesbarkeit, Wartbarkeit und Struktur der vorhandenen Implementierung.
+
+### 3.2 Ergebnisse der Codeanalyse
+
+Bei der Untersuchung wurden folgende Auffälligkeiten festgestellt:
+
+| Datei | Beobachtung | Schweregrad |
+|---|---|---|
+| `Complaint.java` | Mindestlängen für Eingabefelder sind direkt als Zahlenwerte in der `create()`-Methode angegeben. | Niedrig |
+| `Complaint.java` | Durch die direkte Verwendung von `LocalDateTime.now()` ist der Erstellungszeitpunkt bei Tests nicht gezielt steuerbar. | Niedrig |
+| `ComplaintCreated.java` | Die Validierungen sind übersichtlich und vollständig voneinander getrennt. | Keine relevante Auffälligkeit |
+| `ComplaintStatus.java` | Das Enum ist übersichtlich und enthält keine unnötige Komplexität. | Keine relevante Auffälligkeit |
+
+Größere Code-Duplikate oder offensichtliche strukturelle Probleme konnten nicht festgestellt werden. Insbesondere die zentrale Validierungsmethode `validateText()` in `Complaint.java` trägt dazu bei, wiederholte Validierungslogik zu vermeiden.
+
+### 3.3 LLM-gestützte Verbesserungsvorschläge
+
+Das LLM schlug folgende Verbesserungen vor:
+
+1. **Konstanten für Mindestlängen:** Die Mindestlängen für Titel und Beschreibung könnten als Konstanten definiert werden. Dadurch würden die Zahlenwerte in der `create()`-Methode verständlicher und Änderungen einfacher.
+2. **Abstraktion der Zeitquelle:** Durch die Verwendung einer `Clock` könnte der Erstellungszeitpunkt kontrollierter gesetzt werden. Dies würde insbesondere zeitabhängige Tests erleichtern.
+3. **Bestehende Validierungslogik beibehalten:** Die zentrale Validierungsmethode und die Prüfungen der Statusübergänge sind bereits sinnvoll umgesetzt. Zusätzliche Abstraktionen würden momentan keinen ausreichenden Mehrwert bieten.
+
+### 3.4 Bewertung und Umgang mit Technical Debt
+
+Die gefundenen Auffälligkeiten wurden insgesamt als geringfügig eingestuft. Es wurden keine kritischen technischen Schulden festgestellt, die die aktuelle Funktionalität oder Wartbarkeit wesentlich beeinträchtigen.
+
+Als einfache Verbesserung wurde die Definition von Konstanten für die Mindestlängen in `Complaint.java` empfohlen. Die Abstraktion der Zeitquelle mittels `Clock` wurde dagegen als optionale Erweiterung bewertet, da sie für den aktuellen Projektumfang nicht zwingend erforderlich ist.
+
+Die vorgeschlagenen Änderungen wurden im Rahmen dieser Analyse zunächst dokumentiert, aber noch nicht im Quellcode umgesetzt.
+
+### 3.5 Fazit
+
+Die Analyse zeigt, dass die vorhandenen Produktionsdateien bereits eine übersichtliche und gut wartbare Struktur besitzen. Größere Code-Duplikate oder schwerwiegende Regelverstöße wurden nicht festgestellt. Die LLM-Vorschläge halfen dabei, kleinere Verbesserungsmöglichkeiten zu erkennen und hinsichtlich ihres tatsächlichen Nutzens zu bewerten. Dabei wurde bewusst auf zusätzliche Abstraktionen verzichtet, wenn diese die Komplexität unnötig erhöhen würden.
+
+## 04 Frontend-Entwicklung und Erweiterung der Anwendung
+
+---insert content here---
+
+## 05 Reflexion zum Einsatz von Metriken und LLM
+
+Durch die Untersuchung der Softwaremetriken habe ich gelernt, wie Kennzahlen wie Lines of Code und Halstead-Metriken dabei helfen können, die Struktur und Komplexität von Quellcode besser einzuschätzen. Die Testabdeckung mit JaCoCo zeigte zunächst 94 % Instruction Coverage und 81 % Branch Coverage. Mithilfe des LLM konnten wir fehlende Testfälle in `ComplaintCreated.java` identifizieren und ergänzen. Dadurch erreichten wir schließlich eine vollständige Testabdeckung von 100 %. Auch bei der Analyse der Technical Debt war das LLM hilfreich, da es mögliche Verbesserungen wie die Verwendung von Konstanten und einer abstrahierten Zeitquelle vorschlug. Diese Vorschläge haben wir kritisch bewertet und nicht alle übernommen, um unnötige Komplexität zu vermeiden. Insgesamt hat mir der Einsatz von Metriken und LLM gezeigt, dass KI die Codequalität verbessern kann, die Ergebnisse aber weiterhin selbst überprüft und bewertet werden müssen.
+
