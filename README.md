@@ -146,9 +146,9 @@ Für unser Projekt CityFeedback bietet CI/CD folgende Vorteile:
 - **Einfachere Zusammenarbeit:** Änderungen der Teammitglieder werden über GitHub und Pull Requests nachvollziehbar integriert.
 - **Automatisierung:** Wiederkehrende Schritte wie das Bauen der Anwendung müssen nicht jedes Mal manuell ausgeführt werden.
 - **Nachvollziehbarkeit:** GitHub Actions dokumentiert die Ergebnisse der Pipeline.
-- **Spätere Erweiterbarkeit:** Die Pipeline kann zukünftig um automatisierte Tests und ein Deployment ergänzt werden.
+- **Spätere Erweiterbarkeit:** Die Pipeline kann zukünftig um zusätzliche Qualitätssicherungsmaßnahmen und ein automatisches Deployment erweitert werden.
 
-Aktuell verwenden wir GitHub Actions zur Ausführung unserer CI-Pipeline. Der automatische Maven-Build ist erfolgreich in GitHub Actions integriert. Automatisierte Tests und ein Deployment sind für spätere Projektphasen vorgesehen.
+Wir verwenden GitHub Actions zur Ausführung unserer CI-Pipeline. Neben dem automatischen Maven-Build werden seit Übung 4 auch die vorhandenen JUnit-Tests automatisch ausgeführt. Ein automatisches Deployment ist für eine spätere Projektphase vorgesehen.
 
 ## Verwendete CI/CD-Plattform
 
@@ -173,18 +173,18 @@ Der Ablauf besteht aus folgenden Schritten:
 1. **Workflow starten:** GitHub Actions erkennt einen Push oder Pull Request und startet automatisch die CI-Pipeline.
 2. **Repository auschecken:** Der aktuelle Quellcode wird mit `actions/checkout` geladen.
 3. **Java einrichten:** Die Entwicklungsumgebung wird mit Java 17 vorbereitet.
-4. **Maven-Build ausführen:** Maven führt im Projektordner `cityfeedback` automatisch den Build-Prozess aus.
+4. **Maven-Build und Tests ausführen:** Maven kompiliert den Java-Code im Projektordner cityfeedback und führt anschließend die vorhandenen JUnit-Tests automatisch aus.
 5. **Ergebnis anzeigen:** GitHub Actions zeigt an, ob die Pipeline erfolgreich durchgelaufen ist.
 
 Der Maven-Build wird mit folgendem Befehl ausgeführt:
 
-`mvn -B -Dmaven.test.skip=true package`
+`mvn -B clean verify`
 
-Da automatisierte Tests zu diesem Zeitpunkt noch nicht Bestandteil der Übung sind, werden diese beim Build vollständig übersprungen.
+Seit Übung 4 werden die vorhandenen JUnit-Tests beim Maven-Build automatisch ausgeführt. Hierfür verwenden wir den Befehl `mvn -B clean verify`.
 
-Die erfolgreiche Ausführung des automatischen Maven-Builds wurde über GitHub Actions überprüft. Der Workflow wurde erfolgreich abgeschlossen.
+Die erfolgreiche Ausführung wurde über GitHub Actions überprüft. Dabei wurden alle 30 JUnit-Tests erfolgreich abgeschlossen (0 Fehler, 0 fehlgeschlagene Tests, 0 übersprungene Tests). Der Workflow endete mit `BUILD SUCCESS`.
 
-Aktuell wird damit der Maven-Build-Prozess automatisiert. Die vollständige Implementierung der CityFeedback-Anwendung erfolgt im weiteren Projektverlauf.
+Damit werden sowohl der Maven-Build als auch die automatisierten Tests über die CI-Pipeline ausgeführt. Die weitere Implementierung der CityFeedback-Anwendung erfolgt im weiteren Projektverlauf.
 
 ## Geplante Erweiterungen der CI-Pipeline
 
@@ -192,7 +192,7 @@ Im weiteren Projektverlauf soll die Pipeline schrittweise erweitert werden.
 
 Geplant sind insbesondere:
 
-- Integration automatisierter Tests zur Überprüfung der Anwendungslogik,
+- Erweiterung der bestehenden automatisierten JUnit-Tests bei neuen Funktionen,
 - gegebenenfalls zusätzliche Qualitätssicherungsmaßnahmen wie Linting oder Code-Coverage-Auswertungen,
 - langfristig die Verknüpfung der CI-Pipeline mit einem automatisierten Deployment.
 
@@ -476,7 +476,6 @@ public class Complaint {
         this.comments.add(comment);
     }
 }
-<CodeBlock language="markdown" editable>
 ```
 
 Das Beispiel zeigt, dass die Validierung direkt bei der Erstellung erfolgt und Statusänderungen sowie Kommentare über Methoden des Complaint-Aggregates verwaltet werden.
@@ -545,7 +544,14 @@ Die gewählte Architektur trennt die fachlichen Verantwortlichkeiten und ermögl
 
 ## 01 LLM Review der Implementierungsstrategie
 
-Für die Überprüfung unserer ursprünglichen Implementierungsstrategie haben wir Claude von Anthropic verwendet. Ziel war es, unsere geplante Umsetzung der Beschwerdeerstellung im Complaint Management Context kritisch überprüfen zu lassen und Verbesserungsvorschläge zu erhalten. Claude schlug unter anderem eine Factory-Methode, eine konsequente Domänenvalidierung, die Verwendung von Domain Events sowie eine testgetriebene Entwicklung vor. Diese Vorschläge haben wir bewertet und teilweise übernommen: Die Beschwerde wird nun über eine statische Factory-Methode erstellt, Eingaben werden direkt im Complaint-Aggregat validiert und bei erfolgreicher Erstellung wird das Domain Event `ComplaintCreated` erzeugt. Außerdem haben wir uns für TDD entschieden und zunächst die Tests für die Domänenlogik geschrieben, bevor wir die Implementierung ergänzt haben. Auf zusätzliche Value Objects, Fakes und eine komplexe Event-Architektur haben wir bewusst verzichtet, da diese für den aktuellen Funktionsumfang einen zu großen zusätzlichen Aufwand bedeuten würden.
+Für das Review unserer Implementierungsstrategie aus Übung 3 haben wir Claude die beiden Bounded Contexts Identity und Complaint Management sowie das geplante Complaint-Aggregate vorgestellt.
+Claude schlug fünf Verbesserungen zu Factory-Methode, Validierung, Domain Events, Testbarkeit und Entwicklungsreihenfolge vor, die wir kritisch bewertet haben. 
+
+Als wichtigste Domain Events priorisieren wir `ComplaintCreated` (Beschwerde erstellt) und `ComplaintStatusChanged` (Beschwerdestatus geändert), weil sie den zentralen Ablauf unserer Anwendung abbilden.
+Auf Basis des Reviews setzen wir zunächst `ComplaintCreated` testgetrieben um, prüfen anschließend die Statuswechsel und ergänzen Benutzerverwaltung sowie Kommentare schrittweise.
+
+Übernommen haben wir die statische Factory-Methode `Complaint.create()`, die Validierung im Aggregate, das `ComplaintCreated`-Event als Java-Record sowie JUnit-Tests vor der eigentlichen Implementierung.
+Zusätzliche Value Objects, Fakes und eine komplexe Event-Veröffentlichung haben wir wegen des geringen Mehrwerts für den aktuellen Projektumfang zunächst zurückgestellt.
 
 Folgenden Prompt haben wir verwendet
 
@@ -582,7 +588,15 @@ Als Antwort erhielten wir 5 Verbesserungsvorschläge [vollständige Antwort sieh
 
 ### Bewertung der Testfälle mit Claude (JW)
 
-Für die Entwicklung der ersten Domänenlogik haben wir Claude verwendet, um geeignete JUnit-5-Testfälle für die Erstellung einer Beschwerde zu erarbeiten. Dabei haben wir Happy-Path-, Edge-Case- und Negativtests für die Pflichtfelder, Mindestlängen, den initialen Status, das Erstellungsdatum und das Domain Event `ComplaintCreated` erstellen lassen. Die vorgeschlagenen Testfälle haben wir einzeln bewertet und größtenteils übernommen; auf einen separaten Test für das Ausbleiben eines Events bei ungültigen Eingaben haben wir zunächst verzichtet, da dieser in der aktuellen Implementierung keinen eigenständigen Mehrwert bietet. Zusätzlich haben wir Claude nach geeigneten regulären Ausdrücken für die Eingabevalidierung gefragt. Wir haben uns jedoch gegen reguläre Ausdrücke entschieden, da die Prüfungen mit `isBlank()`, `strip()` und einfachen Längenvergleichen verständlicher und für unsere Anforderungen ausreichend sind. Anschließend haben wir die ausgewählten Tests zuerst implementiert und danach die Beschwerdeerstellung in der Klasse `Complaint` umgesetzt. Im weiteren Verlauf wurden die Tests durch das Refactoring ergänzt und angepasst, sodass zuletzt alle 30 JUnit-Tests erfolgreich durch `mvn test` ausgeführt wurden.
+Für die Entwicklung der ersten Domänenlogik haben wir Claude verwendet, um geeignete JUnit-5-Testfälle für die Erstellung einer Beschwerde zu erarbeiten.
+Dabei haben wir Happy-Path-, Edge-Case- und Negativtests für die Pflichtfelder, Mindestlängen, den initialen Status, das Erstellungsdatum und das Domain Event `ComplaintCreated` erstellen lassen.
+
+Die vorgeschlagenen Testfälle haben wir einzeln bewertet und größtenteils übernommen, auf einen separaten Test für das Ausbleiben eines Events bei ungültigen Eingaben haben wir zunächst verzichtet, da dieser in unserer aktuellen Implementierung keinen eigenständigen Mehrwert bietet.
+
+Zusätzlich haben wir den regulären Ausdruck `(?s)^.*\S.*$` für die Kategorievalidierung geprüft, der normale Texte akzeptiert und Eingaben aus gewöhnlichen Leerzeichen ablehnt.
+Bei der Überprüfung zeigte sich jedoch, dass bestimmte Unicode-Leerzeichen wie `U+2003` ohne zusätzliche Regex-Optionen fälschlicherweise akzeptiert werden. Deshalb haben wir uns gegen eine Regex-Implementierung entschieden, da `isBlank()`, `strip()` und einfache Längenvergleiche für unsere Anforderungen verständlicher und zuverlässiger sind. 
+
+Anschließend haben wir die ausgewählten Tests vor der Implementierung der Beschwerdeerstellung geschrieben und im weiteren Verlauf erweitert, sodass zuletzt alle 30 JUnit-Tests erfolgreich mit `mvn test` ausgeführt wurden.
 
 | Nr. | Testfall | Testart | Bewertung | Entscheidung und Begründung |
 |---|---|---|---|---|
@@ -614,15 +628,23 @@ Für die Entwicklung der ersten Domänenlogik haben wir Claude verwendet, um gee
 
 
 ## 03 Implementierung Domänenlogik
-Für die Implementierung der Domänenlogik haben wir zunächst die JUnit-Tests erstellt und anschließend die eigentliche Implementierung vorgenommen. Dadurch haben wir den Test-Driven-Development-Ansatz (TDD) angewendet.
 
-Als erstes haben wir die Enum-Klasse `ComplaintStatus` mit den drei möglichen Statuswerten `OPEN`, `IN_PROGRESS` und `RESOLVED` erstellt. Anschließend wurde die Klasse `Complaint` als Aggregate Root implementiert. Die Erstellung einer neuen Beschwerde erfolgt über die statische Factory-Methode `Complaint.create()`.
+Für die Implementierung unserer Domänenlogik haben wir zunächst JUnit-5-Tests geschrieben und anschließend die zugehörigen Java-Klassen entwickelt, um den TDD-Ansatz anzuwenden.
 
-Bei der Erstellung werden die Eingaben Titel, Beschreibung und Kategorie validiert. Der Titel muss mindestens drei Zeichen und die Beschreibung mindestens zehn Zeichen enthalten. Die Kategorie darf nicht leer sein. Zusätzlich erhält jede Beschwerde automatisch eine eindeutige UUID, den initialen Status `OPEN` und einen Erstellungszeitpunkt.
+Beim LLM-gestützten Pair-Programming nutzten wir die Strukturvorschläge von Claude und verglichen diese ergänzend mit einem von ChatGPT vorgeschlagenen Codeansatz zur Eingabevalidierung. Dabei betrachteten wir sowohl eine einfache Implementierung als auch umfangreichere Varianten mit zusätzlichen Value Objects, einer injizierten `Clock` und einer separaten Event-Verarbeitung.
 
-Für die Erstellung einer Beschwerde wird außerdem das Domain Event `ComplaintCreated` erzeugt. Dieses enthält die ID der erstellten Beschwerde sowie den Zeitpunkt des Ereignisses. Das Event wird zunächst direkt im Complaint-Aggregat erzeugt und kann über `getDomainEvents()` abgerufen werden.
+Wir entschieden uns für die schlanke Variante mit einer privaten Konstruktor-Methode und der statischen Factory-Methode `Complaint.create()`, da sie für unseren aktuellen Projektumfang übersichtlicher und leichter wartbar ist.
+Die Methode `validateText()` überprüft die Bürger-ID, den Titel, die Beschreibung und die Kategorie auf gültige Eingaben und die jeweiligen Mindestlängen.
+Mit `strip()` werden führende und abschließende Leerzeichen entfernt, bevor die validierten Werte gespeichert werden.
+Nach erfolgreicher Validierung erzeugt die Anwendung automatisch eine eindeutige UUID, setzt den initialen Status auf `OPEN` und speichert den Erstellungszeitpunkt.
 
-Die Implementierung wurde anschließend mit Maven und JUnit 5 überprüft. Dabei waren zunächst alle 21 vorhandenen Tests erfolgreich.
+Für die verschiedenen Bearbeitungszustände verwenden wir das Java-Enum `ComplaintStatus`, während das Domain Event `ComplaintCreated` als unveränderlicher Java-Record implementiert wurde.
+Die Event-Verwaltung verwendet mit `List<ComplaintCreated>` Generics und mit `List.of()` eine unveränderliche Liste, wodurch die gespeicherten Event-Einträge nicht von außen verändert werden können.
+Auf Streams und `Optional` haben wir bewusst verzichtet, da sie für diese einfache Domänenlogik keinen zusätzlichen Nutzen bieten.
+Lambdas verwenden wir bereits in unseren JUnit-Tests.
+
+Bei einem anschließenden Code-Review wurden Verbesserungsmöglichkeiten bei der Validierung der Bürger-ID, der Behandlung von Leerzeichen und den Statusübergängen erkannt.
+Diese haben wir in der Refactoring-Phase berücksichtigt und die Tests entsprechend erweitert, sodass laut unserem gespeicherten Maven-Testbericht zuletzt alle 30 JUnit-Tests erfolgreich ausgeführt wurden.
 
 
 ## 04 Test Erweiterung und Refaktorisierung
@@ -640,9 +662,37 @@ Nach den Änderungen haben wir die Tests erneut mit `mvn test` ausgeführt. Insg
 
 ## 05 Modularität und Testbarkeit via CI/CD sicherstellen
 
-----insert Content here----
+Unsere Anwendung CityFeedback wurde in Übung 3 in die beiden Bounded Contexts Identity und Complaint Management unterteilt.
+In Übung 4 haben wir zunächst den zentralen Bereich Complaint Management implementiert, während Identity weiterhin Bestandteil der geplanten Architektur ist.
+
+Der implementierte Code befindet sich im Paket `cityfeedback.complaint.domain` und besteht aus den Klassen `Complaint`, `ComplaintStatus` und dem Domain Event `ComplaintCreated`. Die Klasse `Complaint` dient als Aggregate Root und kapselt die fachlichen Regeln für die Erstellung und Statusänderung einer Beschwerde.
+Die Validierungen werden direkt in der Domäne durchgeführt, sodass ungültige Eingaben frühzeitig abgefangen werden.
+
+Zwischen den Bounded Contexts bestehen derzeit keine direkten Codeabhängigkeiten, da Beschwerden ihren Ersteller lediglich über die `citizenId` referenzieren.
+Die Domänenlogik ist unabhängig von Datenbanken und Webframeworks und kann deshalb mit JUnit 5 getestet werden.
+Repository-Interfaces und Application Services sind für den späteren Ausbau vorgesehen.
+
+Für die automatische Testausführung verwenden wir GitHub Actions mit Java 17 und Maven, wobei der Befehl `mvn -B clean verify` bei Pushes und Pull Requests den Build und die Tests startet.
+Die zuvor deaktivierte Testausführung wurde für Übung 4 aktiviert, damit Codeänderungen automatisch überprüft werden.
+Der erfolgreiche GitHub-Actions-Durchlauf bestätigt, dass alle 30 JUnit-Tests ohne Fehler ausgeführt wurden und der Maven-Build erfolgreich abgeschlossen wurde.
 
 
 ## 06 Kritische Reflexion
 
-----insert Content here----
+Durch den Einsatz von Test-Driven Development (TDD) haben wir gelernt, die Anforderungen an unsere Domänenlogik bereits vor der Implementierung in Form von JUnit-Tests zu formulieren.
+Dadurch konnten wir frühzeitig überprüfen, ob die Erstellung einer Beschwerde, die Eingabevalidierung und die Statusübergänge wie erwartet funktionieren.
+Eine Herausforderung war es, auch sinnvolle Grenzfälle und ungültige Eingaben zu berücksichtigen, anstatt ausschließlich erfolgreiche Abläufe zu testen.
+
+Domain-Driven Design (DDD) half uns dabei, die fachlichen Verantwortlichkeiten unserer Anwendung zu strukturieren und die zentrale Geschäftslogik im Complaint-Aggregate zu kapseln.
+Besonders hilfreich war die Trennung der geplanten Bounded Contexts Identity und Complaint Management, da dadurch die Zuständigkeiten der einzelnen Bereiche klarer wurden.
+Gleichzeitig erforderte DDD zusätzliche Überlegungen zur Modellierung von Entities, Aggregates und Domain Events, obwohl unser Projekt vergleichsweise klein ist. 
+
+Der Einsatz von Claude und ChatGPT unterstützte uns vor allem bei der Entwicklung von Testfällen, der Bewertung unserer Implementierungsstrategie und der Suche nach Verbesserungsmöglichkeiten im Java-Code.
+Besonders nützlich waren die Vorschläge zur Eingabevalidierung, zur Factory-Methode `Complaint.create()` und zur Verwendung eines Java-Records für das Domain Event `ComplaintCreated`.
+Allerdings haben wir nicht alle LLM-Vorschläge übernommen, da beispielsweise zusätzliche Value Objects oder eine komplexere Event-Verarbeitung für unseren aktuellen Projektumfang unnötig gewesen wären.
+Auch bei der Regex-Validierung zeigte sich, dass ein zunächst sinnvoll erscheinender Vorschlag Schwächen bei bestimmten Unicode-Leerzeichen aufweisen kann.
+Eine wesentliche Grenze von LLMs besteht darin, dass sie fehlerhaften, unnötig komplizierten oder nicht zu unserer Architektur passenden Code erzeugen können. Deshalb haben wir Vorschläge kritisch bewertet, ihre Funktionsweise nachvollzogen und die relevanten Anforderungen durch eigene JUnit-Tests überprüft, anstatt generierten Code ungeprüft zu übernehmen.
+
+Unserer Erfahrung nach eignen sich LLMs besonders gut für Testideen, die Erklärung von Java-Techniken und einfache Refactoring-Vorschläge, während fachliche Architekturentscheidungen und die endgültige Bewertung der Codequalität weiterhin von uns selbst getroffen werden müssen.
+
+Insgesamt hat die Kombination aus TDD, DDD und LLM-Unterstützung unsere Entwicklung strukturierter und nachvollziehbarer gemacht, was auch durch die erfolgreiche automatische Ausführung aller 30 JUnit-Tests in unserer GitHub-Actions-Pipeline bestätigt wurde.
