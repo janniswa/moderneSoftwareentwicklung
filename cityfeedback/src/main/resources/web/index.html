@@ -249,5 +249,148 @@
         <p>CityFeedback – Studienprojekt Moderne Softwareentwicklung</p>
     </footer>
 
+
+<script>
+    const formular = document.getElementById("beschwerde-formular");
+    const liste = document.getElementById("beschwerden-liste");
+    const meldung = document.getElementById("meldung");
+
+    // Alle Beschwerden vom Backend laden
+    async function ladeBeschwerden() {
+        try {
+            const antwort = await fetch("/api/beschwerden");
+
+            if (!antwort.ok) {
+                throw new Error("Beschwerden konnten nicht geladen werden.");
+            }
+
+            const beschwerden = await antwort.json();
+
+            liste.replaceChildren();
+
+            if (beschwerden.length === 0) {
+                const hinweis = document.createElement("p");
+                hinweis.textContent = "Noch keine Beschwerden vorhanden.";
+                liste.appendChild(hinweis);
+                return;
+            }
+
+            beschwerden.forEach(beschwerde => {
+                const karte = document.createElement("article");
+                karte.className = "beschwerde";
+
+                const titel = document.createElement("h3");
+                titel.textContent = beschwerde.titel;
+
+                const kategorie = document.createElement("p");
+                kategorie.textContent =
+                    "Kategorie: " + beschwerde.kategorie;
+
+                const beschreibung = document.createElement("p");
+                beschreibung.textContent = beschwerde.beschreibung;
+
+                const status = document.createElement("span");
+                status.className = "status";
+
+                // Status für die Anzeige übersetzen
+                switch (beschwerde.status) {
+                    case "OPEN":
+                        status.textContent = "Offen";
+                        status.classList.add("offen");
+                        break;
+
+                    case "IN_PROGRESS":
+                        status.textContent = "In Bearbeitung";
+                        status.classList.add("in-bearbeitung");
+                        break;
+
+                    case "DONE":
+                    case "COMPLETED":
+                    case "CLOSED":
+                        status.textContent = "Erledigt";
+                        status.classList.add("erledigt");
+                        break;
+
+                    default:
+                        status.textContent =
+                            beschwerde.status || "Unbekannt";
+                }
+
+                karte.appendChild(titel);
+                karte.appendChild(kategorie);
+                karte.appendChild(beschreibung);
+                karte.appendChild(status);
+
+                liste.appendChild(karte);
+            });
+
+        } catch (fehler) {
+            liste.replaceChildren();
+
+            const hinweis = document.createElement("p");
+            hinweis.textContent = fehler.message;
+            liste.appendChild(hinweis);
+        }
+    }
+
+    // Neue Beschwerde einreichen
+    formular.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const absenden = formular.querySelector(
+            "button[type='submit']"
+        );
+
+        absenden.disabled = true;
+        meldung.textContent = "Beschwerde wird gespeichert...";
+        meldung.style.color = "#334155";
+
+        try {
+            // Formulardaten zusammenstellen
+            const daten = new URLSearchParams(
+                new FormData(formular)
+            );
+
+            // Beschwerde an das Java-Backend senden
+            const antwort = await fetch("/api/beschwerden", {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded;charset=UTF-8"
+                },
+                body: daten.toString()
+            });
+
+            const ergebnis = await antwort.json();
+
+            if (!antwort.ok) {
+                throw new Error(
+                    ergebnis.fehler || "Beschwerde konnte nicht gespeichert werden."
+                );
+            }
+
+            meldung.textContent =
+                "Beschwerde erfolgreich eingereicht!";
+            meldung.style.color = "#166534";
+
+            // Formular zurücksetzen
+            formular.reset();
+
+            // Beschwerdeübersicht aktualisieren
+            await ladeBeschwerden();
+
+        } catch (fehler) {
+            meldung.textContent = "Fehler: " + fehler.message;
+            meldung.style.color = "#b91c1c";
+        } finally {
+            absenden.disabled = false;
+        }
+    });
+
+    // Beim Öffnen der Seite Beschwerden laden
+    ladeBeschwerden();
+</script>
+
+    
 </body>
 </html>
