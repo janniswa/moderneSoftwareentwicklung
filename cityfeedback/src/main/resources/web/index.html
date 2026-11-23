@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>CityFeedback – Bürgerportal</title>
+</head>
+<body>
+
+    <header>
+        <h1>CityFeedback</h1>
+        <p>Das Bürgerportal für Anliegen und Beschwerden</p>
+    </header>
+
+    <main>
+
+        <!-- Beschwerdeformular -->
+        <section>
+            <h2>Neue Beschwerde erstellen</h2>
+
+            <form id="beschwerde-formular"
+                  action="/api/beschwerden"
+                  method="post">
+
+                <label for="titel">Titel</label>
+                <input
+                    type="text"
+                    id="titel"
+                    name="titel"
+                    placeholder="z. B. Defekte Straßenlaterne"
+                    minlength="5"
+                    maxlength="100"
+                    required
+                >
+
+                <label for="kategorie">Kategorie</label>
+                <select id="kategorie" name="kategorie" required>
+                    <option value="">Bitte auswählen</option>
+                    <option value="Beleuchtung">Beleuchtung</option>
+                    <option value="Verkehr">Verkehr</option>
+                    <option value="Umwelt">Umwelt</option>
+                    <option value="Sonstiges">Sonstiges</option>
+                </select>
+
+                <label for="beschreibung">Beschreibung</label>
+                <textarea
+                    id="beschreibung"
+                    name="beschreibung"
+                    rows="5"
+                    minlength="10"
+                    placeholder="Beschreibe dein Anliegen ..."
+                    required
+                ></textarea>
+
+                <button type="submit">
+                    Beschwerde einreichen
+                </button>
+
+            </form>
+
+            <p id="meldung" role="status" aria-live="polite"></p>
+        </section>
+
+        <!-- Beschwerdeübersicht -->
+        <section>
+            <h2>Beschwerdeübersicht</h2>
+
+            <p>Hier werden die eingereichten Beschwerden
+               und ihr aktueller Bearbeitungsstatus angezeigt.</p>
+
+            <div id="beschwerden-liste">
+                <p>Noch keine Beschwerden angezeigt.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>CityFeedback – Studienprojekt Moderne Softwareentwicklung</p>
+    </footer>
+
+</body>
+</html>
