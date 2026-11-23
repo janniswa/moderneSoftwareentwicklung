@@ -79,6 +79,53 @@ public class BeschwerdeServer {
             }
         });
 
+        
+        // HTML-Benutzeroberfläche bereitstellen
+        server.createContext("/", exchange -> {
+
+            String pfad = exchange.getRequestURI().getPath();
+
+            if (!"/".equals(pfad)
+                    && !"/index.html".equals(pfad)) {
+
+                exchange.sendResponseHeaders(404, -1);
+                exchange.close();
+                return;
+            }
+
+            if (!"GET".equals(exchange.getRequestMethod())) {
+
+                exchange.getResponseHeaders().set("Allow", "GET");
+                exchange.sendResponseHeaders(405, -1);
+                exchange.close();
+                return;
+            }
+
+            try (var datei = BeschwerdeServer.class
+                    .getResourceAsStream("/web/index.html")) {
+
+                if (datei == null) {
+                    exchange.sendResponseHeaders(404, -1);
+                    exchange.close();
+                    return;
+                }
+
+                byte[] daten = datei.readAllBytes();
+
+                exchange.getResponseHeaders().set(
+                        "Content-Type",
+                        "text/html; charset=UTF-8"
+                );
+
+                exchange.sendResponseHeaders(200, daten.length);
+
+                try (var ausgabe = exchange.getResponseBody()) {
+                    ausgabe.write(daten);
+                }
+            }
+        });
+
+        
         server.start();
 
         System.out.println("CityFeedback läuft auf Port 8080");
