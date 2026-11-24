@@ -198,7 +198,7 @@
                     id="titel"
                     name="titel"
                     placeholder="z. B. Defekte Straßenlaterne"
-                    minlength="5"
+                    minlength="3"
                     maxlength="100"
                     required
                 >
@@ -304,9 +304,7 @@
                         status.classList.add("in-bearbeitung");
                         break;
 
-                    case "DONE":
-                    case "COMPLETED":
-                    case "CLOSED":
+                    case "RESOLVED":
                         status.textContent = "Erledigt";
                         status.classList.add("erledigt");
                         break;
