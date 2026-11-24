@@ -865,7 +865,63 @@ Die Analyse zeigt, dass die vorhandenen Produktionsdateien bereits eine übersic
 
 ## 04 Frontend-Entwicklung und Erweiterung der Anwendung
 
----insert content here---
+
+### Frontend-Entwicklung und Erweiterung der Anwendung
+
+#### Umsetzung
+
+Im Rahmen dieser Aufgabe wurde eine einfache Weboberfläche für CityFeedback mit HTML, CSS und JavaScript entwickelt.
+Die Benutzeroberfläche ermöglicht das Einreichen von Beschwerden sowie die Anzeige bereits gespeicherter Beschwerden und ihres Bearbeitungsstatus.
+Für die Anbindung an das bestehende Java-Backend wurden folgende Komponenten ergänzt:
+
+- ComplaintRepository: Schnittstelle zur Speicherung und zum Abrufen von Beschwerden.
+- BeschwerdeSpeicher: In-Memory-Implementierung des Repository-Interfaces.
+- BeschwerdeService: Erstellung, Speicherung und Abfrage von Beschwerden.
+- BeschwerdeServer: HTTP-Server zur Kommunikation zwischen Frontend und Backend.
+
+Die bestehende Domänenlogik aus Übung 4 wurde wiederverwendet. Die Speicherung erfolgt weiterhin im Arbeitsspeicher, sodass keine persistente Datenbank
+benötigt wird.
+
+#### HTTP-Schnittstellen
+
+| Methode | Endpunkt | Funktion |
+|---|---|---|
+| GET | / | Benutzeroberfläche anzeigen |
+| GET | /api/beschwerden | Beschwerden abrufen |
+| POST | /api/beschwerden | Beschwerde erstellen |
+
+#### Tests
+
+Für den Beschwerdespeicher und den BeschwerdeService wurden insgesamt zwölf zusätzliche JUnit-Tests erstellt. Die automatisierten Builds in GitHub Actions waren erfolgreich. Die Benutzeroberfläche wurde anschließend mithilfe von GitHub Codespaces im Browser gestartet und manuell getestet.
+
+| Testfall | Erwartetes Ergebnis | Ergebnis |
+|---|---|---|
+| Beschwerde erstellen | Beschwerde wird gespeichert und angezeigt | Bestanden |
+| Seite neu laden | Gespeicherte Beschwerde bleibt sichtbar | Bestanden |
+| Ungültige Eingaben | Absenden wird verhindert | Bestanden |
+| Mehrere Beschwerden | Alle Beschwerden werden angezeigt | Bestanden |
+
+Alle vier manuellen UI-Tests wurden erfolgreich durchgeführt.
+
+#### LLM-Einsatz
+
+ChatGPT wurde zur Unterstützung bei der Entwicklung des Frontends und der Backend-Anbindung eingesetzt. Das LLM lieferte Vorschläge zur Architektur, zur Implementierung der HTTP-Schnittstelle, zur Gestaltung der Benutzeroberfläche sowie zur Erstellung zusätzlicher Testfälle. Die Umsetzung erfolgte schrittweise, wobei nach jeder Änderung die CI-Pipeline überprüft wurde. Die tatsächliche Funktionalität der Benutzeroberfläche wurde zusätzlich manuell im Browser getestet.
+
+#### Aktuelle Einschränkungen
+
+Die Anwendung verwendet einen Demo-Benutzer und einen In-Memory-Speicher. Eine vollständige Benutzerverwaltung, persistente Speicherung und die Änderung des
+Bearbeitungsstatus über die Benutzeroberfläche sind noch nicht implementiert.
+
+#### Screenshots
+
+**Beschwerdeformular**
+
+![Beschwerdeformular](docs/uebung5/beschwerdeformular.png)
+
+**Beschwerdeübersicht**
+
+![Beschwerdeübersicht](docs/uebung5/beschwerdeuebersicht.png)
+
 
 ## 05 Reflexion zum Einsatz von Metriken und LLM
 
