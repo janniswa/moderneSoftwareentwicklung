@@ -942,6 +942,46 @@ Die vorgeschlagenen Änderungen wurden im Rahmen dieser Analyse zunächst dokume
 
 Die Analyse zeigt, dass die vorhandenen Produktionsdateien bereits eine übersichtliche und gut wartbare Struktur besitzen. Größere Code-Duplikate oder schwerwiegende Regelverstöße wurden nicht festgestellt. Die LLM-Vorschläge halfen dabei, kleinere Verbesserungsmöglichkeiten zu erkennen und hinsichtlich ihres tatsächlichen Nutzens zu bewerten. Dabei wurde bewusst auf zusätzliche Abstraktionen verzichtet, wenn diese die Komplexität unnötig erhöhen würden.
 
+
+#### Ergänzende werkzeuggestützte Analyse
+
+Nach der Erweiterung der Anwendung wurde eine zusätzliche automatisierte Analyse der technischen Schulden durchgeführt.
+Anstelle von SonarQube wurden PMD, CPD und das Maven Versions Plugin verwendet. Diese Werkzeuge lassen sich direkt über Maven in GitHub Codespaces ausführen und
+erfordern keine zusätzliche lokale Installation.
+
+#### Ergebnisse der automatisierten Analyse
+
+| Werkzeug | Untersuchungsbereich | Ergebnis |
+|---|---|---|
+| PMD 7.7.0 | Regelverletzungen | 0 gemeldete Regelverletzungen |
+| CPD 7.7.0 | Code-Duplizierungen | 0 erkannte Duplikate |
+| Maven Versions Plugin | Veraltete Abhängigkeiten | 1 mögliche Aktualisierung |
+
+Bei der Duplikationsanalyse wurden sieben Java-Dateien mit einem Schwellenwert von 50 Tokens untersucht.
+
+Das Maven Versions Plugin meldete eine mögliche Aktualisierung von JUnit 5.11.4 auf 6.2.0-M1. Da es sich bei der vorgeschlagenen Version um eine Vorabversion handelt und die bestehenden Tests erfolgreich ausgeführt werden, wurde bewusst auf eine Aktualisierung verzichtet.
+Die Ergebnisse zeigen, dass innerhalb der verwendeten Analyseregeln keine weiteren Regelverletzungen oder Code-Duplizierungen festgestellt wurden.
+
+#### Bewertung und Reduzierung technischer Schulden
+
+| Auffälligkeit | Schweregrad | Maßnahme | Status |
+|---|---|---|---|
+| Generierte Maven-Dateien im Repository | Mittel | target-Ordner aus der Git-Verwaltung entfernt und in .gitignore aufgenommen | Behoben |
+| Eingeschränkte Testbarkeit des HTTP-Servers | Mittel | Serverstart in eine separate Methode ausgelagert | Behoben |
+| Fehlende automatisierte HTTP-Tests | Mittel | Zehn zusätzliche Integrationstests implementiert | Behoben |
+| Neuere JUnit-Version verfügbar | Niedrig | Bestehende Version bewusst beibehalten | Zurückgestellt |
+| Manuelle JSON-Erzeugung | Niedrig | Für den aktuellen Projektumfang akzeptiert | Offen |
+
+Durch die Bereinigung des Git-Repositorys werden automatisch generierte Build-Dateien nicht mehr versioniert. Dadurch werden unnötige Änderungen und mögliche Merge-Konflikte vermieden. Das Refactoring des HTTP-Servers verbessert dessen Testbarkeit. Die zusätzlichen automatisierten Tests erhöhten die gesamte Instruction Coverage von 39,72 % auf 90,11 %.
+
+#### Kritische Bewertung des LLM-Einsatzes
+
+ChatGPT unterstützte die Auswahl geeigneter Analysewerkzeuge, die Interpretation der Ergebnisse sowie die Priorisierung technischer Schulden.
+Die Empfehlungen zur Bereinigung des Git-Repositorys und zur Verbesserung der Testbarkeit des HTTP-Servers wurden umgesetzt.
+Eine Aktualisierung der JUnit-Abhängigkeit wurde bewusst nicht vorgenommen. Auch auf eine zusätzliche JSON-Bibliothek wurde aufgrund des derzeit geringen
+Projektumfangs verzichtet. Die Ergebnisse der Analysewerkzeuge wurden kritisch bewertet. Das Fehlen gemeldeter Regelverletzungen bedeutet nicht, dass die Anwendung vollständig frei von technischen Schulden ist. Für den aktuellen Entwicklungsstand wurde ein angemessenes Verhältnis zwischen Codequalität, Wartbarkeit und Entwicklungsaufwand angestrebt.
+
+
 ## 04 Frontend-Entwicklung und Erweiterung der Anwendung
 
 
