@@ -19,14 +19,23 @@ import java.util.stream.Collectors;
 
 public class BeschwerdeServer {
 
-    public static void main(String[] args) throws IOException {
+    
+public static void main(String[] args) throws IOException {
 
-        BeschwerdeService service =
-                new BeschwerdeService(new BeschwerdeSpeicher());
+    starteServer(8080);
 
-        HttpServer server = HttpServer.create(
-                new InetSocketAddress(8080), 0
-        );
+    System.out.println("CityFeedback läuft auf Port 8080");
+}
+
+static HttpServer starteServer(int port) throws IOException {
+
+    BeschwerdeService service =
+            new BeschwerdeService(new BeschwerdeSpeicher());
+
+    HttpServer server = HttpServer.create(
+            new InetSocketAddress(port), 0
+    );
+
 
         server.createContext("/api/beschwerden", exchange -> {
             try {
@@ -126,10 +135,12 @@ public class BeschwerdeServer {
         });
 
         
+       
         server.start();
 
-        System.out.println("CityFeedback läuft auf Port 8080");
+        return server;
     }
+
 
     // Formulardaten auslesen
     private static Map<String, String> leseFormular(
