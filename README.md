@@ -730,6 +730,34 @@ Für die Datei `Complaint.java` wurden zusätzlich folgende Werte manuell ermitt
 | Konstruktoren | 1 |
 | Parameter insgesamt | 12 |
 
+
+#### Detaillierte Parameteranzahl pro Methode
+
+Ergänzend wurde die Anzahl der Parameter pro Methode in der Klasse `Complaint.java` untersucht.
+
+| Methode / Konstruktor | Parameteranzahl |
+|---|---:|
+| Complaint() (Konstruktor) | 5 |
+| create() | 4 |
+| validateText() | 3 |
+| startProcessing() | 0 |
+| resolve() | 0 |
+| getId() | 0 |
+| getCitizenId() | 0 |
+| getTitle() | 0 |
+| getDescription() | 0 |
+| getCategory() | 0 |
+| getStatus() | 0 |
+| getCreatedAt() | 0 |
+| getDomainEvents() | 0 |
+| **Gesamt (inkl. Konstruktor)** | **12** |
+
+Die meisten Methoden benötigen keine Parameter. Lediglich der Konstruktor sowie die Methoden create() und validateText() weisen mehrere Parameter auf.
+
+Da diese Parameter für die Erstellung und Validierung einer Beschwerde benötigt werden, ist ihre Anzahl für den aktuellen Projektumfang nachvollziehbar.
+Eine zusätzliche Umstrukturierung ist momentan nicht erforderlich. Die Analyse bezieht sich auf die ursprüngliche Domänenlogik aus Übung 4.
+
+
 ### 1.3 Interpretation der Ergebnisse
 
 Die Messwerte zeigen, dass die Datei `Complaint.java` mit 95 Codezeilen den größten Umfang und die höchsten Halstead-Werte aufweist. Sie enthält den größten Teil der Geschäftslogik, darunter die Erstellung und Validierung von Beschwerden sowie die Verwaltung der Statusänderungen.
@@ -822,6 +850,57 @@ Durch die zusätzlichen Tests konnten sämtliche zuvor nicht abgedeckten Stellen
 
 Die Verwendung von JaCoCo ermöglichte es, bisher nicht getestete Stellen gezielt zu identifizieren. Die vom LLM vorgeschlagenen zusätzlichen Testfälle waren sinnvoll und konnten erfolgreich umgesetzt werden. Besonders hilfreich war dabei die getrennte Betrachtung der einzelnen Dateien, wodurch die fehlende Testabdeckung in `ComplaintCreated.java` schnell lokalisiert werden konnte. Das angestrebte Ziel von mindestens 80 % wurde deutlich übertroffen. Die abschließende Testabdeckung beträgt sowohl bei den Instruktionen als auch bei den Verzweigungen 100 %.
 
+
+#### Erneute Coverage-Analyse nach der Frontend-Erweiterung
+
+Durch die Erweiterung der Anwendung um einen Beschwerdespeicher, einen BeschwerdeService und einen HTTP-Server wurde eine erneute Messung der Testabdeckung
+mit JaCoCo durchgeführt. Zunächst wurden zwölf zusätzliche JUnit-Tests für den Beschwerdespeicher und den BeschwerdeService ergänzt.
+Die Instruction Coverage der bisherigen Domänenlogik sowie dieser beiden Komponenten betrug weiterhin 100 %.
+Da der neue HTTP-Server zunächst nur manuell getestet wurde, sank die gesamte Testabdeckung auf 39,72 %.
+Zur Verbesserung der Testbarkeit wurde der HTTP-Server refaktorisiert, sodass er innerhalb automatisierter JUnit-Tests gestartet und beendet werden kann.
+Anschließend wurden mithilfe eines LLM zehn zusätzliche HTTP-Integrationstests entwickelt. Diese prüfen unter anderem das Erstellen und Abrufen von Beschwerden,
+ungültige Eingaben, nicht erlaubte HTTP-Methoden, die Verarbeitung von Sonderzeichen sowie die Bereitstellung der HTML-Oberfläche.
+
+#### Ergebnisse der erneuten Coverage-Messung
+
+| Metrik | Vor den HTTP-Tests | Nach den HTTP-Tests |
+|---|---:|---:|
+| Instruction Coverage | 39,72 % | 90,11 % |
+| Branch Coverage | 35,71 % | 82,14 % |
+| Line Coverage | 42,07 % | 89,76 % |
+
+#### Instruction Coverage pro Klasse
+
+| Klasse | Testabdeckung |
+|---|---:|
+| Complaint | 100 % |
+| ComplaintCreated | 100 % |
+| ComplaintStatus | 100 % |
+| BeschwerdeSpeicher | 100 % |
+| BeschwerdeService | 100 % |
+| BeschwerdeServer | 83,67 % |
+| **Gesamtabdeckung** | **90,11 %** |
+
+Die Instruction Coverage konnte durch die zusätzlichen
+HTTP-Tests um 50,39 Prozentpunkte gesteigert werden.
+
+Damit wurde der angestrebte Zielwert von 80 %
+übertroffen. Die automatisierte CI-Pipeline wurde
+erfolgreich ausgeführt.
+
+Der Einsatz des LLM unterstützte insbesondere die
+Identifikation geeigneter Testfälle und die Verbesserung
+der Testbarkeit des HTTP-Servers. Die generierten Tests
+wurden anhand der tatsächlichen Testergebnisse überprüft.
+
+Die Coverage-Messung erfolgte mit JaCoCo über den
+Maven-Befehl `mvn clean verify` in GitHub Codespaces.
+
+Die angegebenen Coverage-Werte beziehen sich auf den
+Java-Code. Die HTML-, CSS- und JavaScript-Komponenten
+wurden zusätzlich manuell im Browser getestet.
+
+
 ## 03 Technical Debt und Regelverletzungen mit LLM analysieren
 
 ### 3.1 Vorgehensweise
@@ -863,11 +942,109 @@ Die vorgeschlagenen Änderungen wurden im Rahmen dieser Analyse zunächst dokume
 
 Die Analyse zeigt, dass die vorhandenen Produktionsdateien bereits eine übersichtliche und gut wartbare Struktur besitzen. Größere Code-Duplikate oder schwerwiegende Regelverstöße wurden nicht festgestellt. Die LLM-Vorschläge halfen dabei, kleinere Verbesserungsmöglichkeiten zu erkennen und hinsichtlich ihres tatsächlichen Nutzens zu bewerten. Dabei wurde bewusst auf zusätzliche Abstraktionen verzichtet, wenn diese die Komplexität unnötig erhöhen würden.
 
+
+#### Ergänzende werkzeuggestützte Analyse
+
+Nach der Erweiterung der Anwendung wurde eine zusätzliche automatisierte Analyse der technischen Schulden durchgeführt.
+Anstelle von SonarQube wurden PMD, CPD und das Maven Versions Plugin verwendet. Diese Werkzeuge lassen sich direkt über Maven in GitHub Codespaces ausführen und
+erfordern keine zusätzliche lokale Installation.
+
+#### Ergebnisse der automatisierten Analyse
+
+| Werkzeug | Untersuchungsbereich | Ergebnis |
+|---|---|---|
+| PMD 7.7.0 | Regelverletzungen | 0 gemeldete Regelverletzungen |
+| CPD 7.7.0 | Code-Duplizierungen | 0 erkannte Duplikate |
+| Maven Versions Plugin | Veraltete Abhängigkeiten | 1 mögliche Aktualisierung |
+
+Bei der Duplikationsanalyse wurden sieben Java-Dateien mit einem Schwellenwert von 50 Tokens untersucht.
+
+Das Maven Versions Plugin meldete eine mögliche Aktualisierung von JUnit 5.11.4 auf 6.2.0-M1. Da es sich bei der vorgeschlagenen Version um eine Vorabversion handelt und die bestehenden Tests erfolgreich ausgeführt werden, wurde bewusst auf eine Aktualisierung verzichtet.
+Die Ergebnisse zeigen, dass innerhalb der verwendeten Analyseregeln keine weiteren Regelverletzungen oder Code-Duplizierungen festgestellt wurden.
+
+#### Bewertung und Reduzierung technischer Schulden
+
+| Auffälligkeit | Schweregrad | Maßnahme | Status |
+|---|---|---|---|
+| Generierte Maven-Dateien im Repository | Mittel | target-Ordner aus der Git-Verwaltung entfernt und in .gitignore aufgenommen | Behoben |
+| Eingeschränkte Testbarkeit des HTTP-Servers | Mittel | Serverstart in eine separate Methode ausgelagert | Behoben |
+| Fehlende automatisierte HTTP-Tests | Mittel | Zehn zusätzliche Integrationstests implementiert | Behoben |
+| Neuere JUnit-Version verfügbar | Niedrig | Bestehende Version bewusst beibehalten | Zurückgestellt |
+| Manuelle JSON-Erzeugung | Niedrig | Für den aktuellen Projektumfang akzeptiert | Offen |
+
+Durch die Bereinigung des Git-Repositorys werden automatisch generierte Build-Dateien nicht mehr versioniert. Dadurch werden unnötige Änderungen und mögliche Merge-Konflikte vermieden. Das Refactoring des HTTP-Servers verbessert dessen Testbarkeit. Die zusätzlichen automatisierten Tests erhöhten die gesamte Instruction Coverage von 39,72 % auf 90,11 %.
+
+#### Kritische Bewertung des LLM-Einsatzes
+
+ChatGPT unterstützte die Auswahl geeigneter Analysewerkzeuge, die Interpretation der Ergebnisse sowie die Priorisierung technischer Schulden.
+Die Empfehlungen zur Bereinigung des Git-Repositorys und zur Verbesserung der Testbarkeit des HTTP-Servers wurden umgesetzt.
+Eine Aktualisierung der JUnit-Abhängigkeit wurde bewusst nicht vorgenommen. Auch auf eine zusätzliche JSON-Bibliothek wurde aufgrund des derzeit geringen
+Projektumfangs verzichtet. Die Ergebnisse der Analysewerkzeuge wurden kritisch bewertet. Das Fehlen gemeldeter Regelverletzungen bedeutet nicht, dass die Anwendung vollständig frei von technischen Schulden ist. Für den aktuellen Entwicklungsstand wurde ein angemessenes Verhältnis zwischen Codequalität, Wartbarkeit und Entwicklungsaufwand angestrebt.
+
+
 ## 04 Frontend-Entwicklung und Erweiterung der Anwendung
 
----insert content here---
+
+### Frontend-Entwicklung und Erweiterung der Anwendung
+
+#### Umsetzung
+
+Im Rahmen dieser Aufgabe wurde eine einfache Weboberfläche für CityFeedback mit HTML, CSS und JavaScript entwickelt.
+Die Benutzeroberfläche ermöglicht das Einreichen von Beschwerden sowie die Anzeige bereits gespeicherter Beschwerden und ihres Bearbeitungsstatus.
+Für die Anbindung an das bestehende Java-Backend wurden folgende Komponenten ergänzt:
+
+- ComplaintRepository: Schnittstelle zur Speicherung und zum Abrufen von Beschwerden.
+- BeschwerdeSpeicher: In-Memory-Implementierung des Repository-Interfaces.
+- BeschwerdeService: Erstellung, Speicherung und Abfrage von Beschwerden.
+- BeschwerdeServer: HTTP-Server zur Kommunikation zwischen Frontend und Backend.
+
+Die bestehende Domänenlogik aus Übung 4 wurde wiederverwendet. Die Speicherung erfolgt weiterhin im Arbeitsspeicher, sodass keine persistente Datenbank
+benötigt wird.
+
+#### HTTP-Schnittstellen
+
+| Methode | Endpunkt | Funktion |
+|---|---|---|
+| GET | / | Benutzeroberfläche anzeigen |
+| GET | /api/beschwerden | Beschwerden abrufen |
+| POST | /api/beschwerden | Beschwerde erstellen |
+
+#### Tests
+
+Für den Beschwerdespeicher und den BeschwerdeService wurden insgesamt zwölf zusätzliche JUnit-Tests erstellt. Die automatisierten Builds in GitHub Actions waren erfolgreich. Die Benutzeroberfläche wurde anschließend mithilfe von GitHub Codespaces im Browser gestartet und manuell getestet.
+
+| Testfall | Erwartetes Ergebnis | Ergebnis |
+|---|---|---|
+| Beschwerde erstellen | Beschwerde wird gespeichert und angezeigt | Bestanden |
+| Seite neu laden | Gespeicherte Beschwerde bleibt sichtbar | Bestanden |
+| Ungültige Eingaben | Absenden wird verhindert | Bestanden |
+| Mehrere Beschwerden | Alle Beschwerden werden angezeigt | Bestanden |
+
+Alle vier manuellen UI-Tests wurden erfolgreich durchgeführt.
+
+#### LLM-Einsatz
+
+ChatGPT wurde zur Unterstützung bei der Entwicklung des Frontends und der Backend-Anbindung eingesetzt. Das LLM lieferte Vorschläge zur Architektur, zur Implementierung der HTTP-Schnittstelle, zur Gestaltung der Benutzeroberfläche sowie zur Erstellung zusätzlicher Testfälle. Die Umsetzung erfolgte schrittweise, wobei nach jeder Änderung die CI-Pipeline überprüft wurde. Die tatsächliche Funktionalität der Benutzeroberfläche wurde zusätzlich manuell im Browser getestet.
+
+#### Aktuelle Einschränkungen
+
+Die Anwendung verwendet einen Demo-Benutzer und einen In-Memory-Speicher. Eine vollständige Benutzerverwaltung, persistente Speicherung und die Änderung des
+Bearbeitungsstatus über die Benutzeroberfläche sind noch nicht implementiert.
+
+#### Screenshots
+
+**Beschwerdeformular**
+
+![Beschwerdeformular](docs/uebung5/BeschwerdeStart.png)
+
+**Beschwerdeübersicht**
+
+![Beschwerdeübersicht](docs/uebung5/BeschwerdeTests.png)
+
 
 ## 05 Reflexion zum Einsatz von Metriken und LLM
 
 Durch die Untersuchung der Softwaremetriken habe ich gelernt, wie Kennzahlen wie Lines of Code und Halstead-Metriken dabei helfen können, die Struktur und Komplexität von Quellcode besser einzuschätzen. Die Testabdeckung mit JaCoCo zeigte zunächst 94 % Instruction Coverage und 81 % Branch Coverage. Mithilfe des LLM konnten wir fehlende Testfälle in `ComplaintCreated.java` identifizieren und ergänzen. Dadurch erreichten wir schließlich eine vollständige Testabdeckung von 100 %. Auch bei der Analyse der Technical Debt war das LLM hilfreich, da es mögliche Verbesserungen wie die Verwendung von Konstanten und einer abstrahierten Zeitquelle vorschlug. Diese Vorschläge haben wir kritisch bewertet und nicht alle übernommen, um unnötige Komplexität zu vermeiden. Insgesamt hat mir der Einsatz von Metriken und LLM gezeigt, dass KI die Codequalität verbessern kann, die Ergebnisse aber weiterhin selbst überprüft und bewertet werden müssen.
 
+Bei der Entwicklung des Frontends hat uns der Einsatz von ChatGPT besonders bei der schrittweisen Implementierung und der Anbindung an das bestehende Java-Backend unterstützt. Dadurch konnte ich auch ohne lokale Entwicklungsumgebung eine funktionierende Webanwendung über GitHub und GitHub Codespaces erstellen.
+Die erneute Coverage-Analyse zeigte, dass durch die Erweiterung des Backends die gesamte Testabdeckung zunächst deutlich gesunken war. Mithilfe zusätzlicher HTTP-Integrationstests konnte sie anschließend auf 90,11 % erhöht werden. Dadurch wurde mir deutlich, wie hilfreich Softwaremetriken bei der Identifikation von Schwachstellen sind. Gleichzeitig zeigte sich, dass LLM-generierter Code nicht ungeprüft übernommen werden sollte. Beispielsweise mussten die Validierungsregeln und Statusbezeichnungen zwischen Frontend und Backend nachträglich angepasst werden. Auch ein erfolgreicher CI-Build ersetzt keine manuellen Tests der Benutzeroberfläche. Insgesamt hat der LLM-Einsatz die Entwicklung erleichtert, während automatisierte Tests, Metriken und manuelle Überprüfungen zur Qualitätssicherung beigetragen haben.

@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>CityFeedback – Bürgerportal</title>
+    
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f2f5fa;
+        color: #334155;
+        line-height: 1.6;
+    }
+
+    header {
+        background-color: #193454;
+        color: white;
+        text-align: center;
+        padding: 32px 20px;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 32px;
+    }
+
+    header p {
+        margin: 8px 0 0;
+        color: #d6e3f3;
+    }
+
+    main {
+        max-width: 850px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    section {
+        background: white;
+        padding: 30px;
+        margin-bottom: 25px;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    h2 {
+        color: #193454;
+        margin-top: 0;
+        font-size: 23px;
+    }
+
+    label {
+        display: block;
+        margin-top: 18px;
+        margin-bottom: 6px;
+        font-weight: bold;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        font-size: 15px;
+        font-family: inherit;
+        background-color: white;
+        color: #334155;
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: 2px solid #2563eb;
+        outline-offset: 1px;
+    }
+
+    button {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 7px;
+        padding: 13px 22px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 22px;
+    }
+
+    button:hover {
+        background-color: #1d4ed8;
+    }
+
+    button:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 3px;
+    }
+
+    #meldung {
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    #beschwerden-liste {
+        margin-top: 20px;
+    }
+
+    .beschwerde {
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        padding: 18px;
+        margin-bottom: 15px;
+        background-color: #f8fafc;
+    }
+
+    .beschwerde h3 {
+        color: #193454;
+        margin: 0 0 8px;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        background-color: #e2e8f0;
+    }
+
+    .status.offen {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status.in-bearbeitung {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status.erledigt {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    footer {
+        text-align: center;
+        padding: 20px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+        main {
+            margin: 15px auto;
+            padding: 0 12px;
+        }
+
+        section {
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 26px;
+        }
+    }
+</style>
+
+</head>
+<body>
+
+    <header>
+        <h1>CityFeedback</h1>
+        <p>Das Bürgerportal für Anliegen und Beschwerden</p>
+    </header>
+
+    <main>
+
+        <!-- Beschwerdeformular -->
+        <section>
+            <h2>Neue Beschwerde erstellen</h2>
+
+            <form id="beschwerde-formular"
+                  action="/api/beschwerden"
+                  method="post">
+
+                <label for="titel">Titel</label>
+                <input
+                    type="text"
+                    id="titel"
+                    name="titel"
+                    placeholder="z. B. Defekte Straßenlaterne"
+                    minlength="3"
+                    maxlength="100"
+                    required
+                >
+
+                <label for="kategorie">Kategorie</label>
+                <select id="kategorie" name="kategorie" required>
+                    <option value="">Bitte auswählen</option>
+                    <option value="Beleuchtung">Beleuchtung</option>
+                    <option value="Verkehr">Verkehr</option>
+                    <option value="Umwelt">Umwelt</option>
+                    <option value="Sonstiges">Sonstiges</option>
+                </select>
+
+                <label for="beschreibung">Beschreibung</label>
+                <textarea
+                    id="beschreibung"
+                    name="beschreibung"
+                    rows="5"
+                    minlength="10"
+                    placeholder="Beschreibe dein Anliegen ..."
+                    required
+                ></textarea>
+
+                <button type="submit">
+                    Beschwerde einreichen
+                </button>
+
+            </form>
+
+            <p id="meldung" role="status" aria-live="polite"></p>
+        </section>
+
+        <!-- Beschwerdeübersicht -->
+        <section>
+            <h2>Beschwerdeübersicht</h2>
+
+            <p>Hier werden die eingereichten Beschwerden
+               und ihr aktueller Bearbeitungsstatus angezeigt.</p>
+
+            <div id="beschwerden-liste">
+                <p>Noch keine Beschwerden angezeigt.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>CityFeedback – Studienprojekt Moderne Softwareentwicklung</p>
+    </footer>
+
+
+<script>
+    const formular = document.getElementById("beschwerde-formular");
+    const liste = document.getElementById("beschwerden-liste");
+    const meldung = document.getElementById("meldung");
+
+    // Alle Beschwerden vom Backend laden
+    async function ladeBeschwerden() {
+        try {
+            const antwort = await fetch("/api/beschwerden");
+
+            if (!antwort.ok) {
+                throw new Error("Beschwerden konnten nicht geladen werden.");
+            }
+
+            const beschwerden = await antwort.json();
+
+            liste.replaceChildren();
+
+            if (beschwerden.length === 0) {
+                const hinweis = document.createElement("p");
+                hinweis.textContent = "Noch keine Beschwerden vorhanden.";
+                liste.appendChild(hinweis);
+                return;
+            }
+
+            beschwerden.forEach(beschwerde => {
+                const karte = document.createElement("article");
+                karte.className = "beschwerde";
+
+                const titel = document.createElement("h3");
+                titel.textContent = beschwerde.titel;
+
+                const kategorie = document.createElement("p");
+                kategorie.textContent =
+                    "Kategorie: " + beschwerde.kategorie;
+
+                const beschreibung = document.createElement("p");
+                beschreibung.textContent = beschwerde.beschreibung;
+
+                const status = document.createElement("span");
+                status.className = "status";
+
+                // Status für die Anzeige übersetzen
+                switch (beschwerde.status) {
+                    case "OPEN":
+                        status.textContent = "Offen";
+                        status.classList.add("offen");
+                        break;
+
+                    case "IN_PROGRESS":
+                        status.textContent = "In Bearbeitung";
+                        status.classList.add("in-bearbeitung");
+                        break;
+
+                    case "RESOLVED":
+                        status.textContent = "Erledigt";
+                        status.classList.add("erledigt");
+                        break;
+
+                    default:
+                        status.textContent =
+                            beschwerde.status || "Unbekannt";
+                }
+
+                karte.appendChild(titel);
+                karte.appendChild(kategorie);
+                karte.appendChild(beschreibung);
+                karte.appendChild(status);
+
+                liste.appendChild(karte);
+            });
+
+        } catch (fehler) {
+            liste.replaceChildren();
+
+            const hinweis = document.createElement("p");
+            hinweis.textContent = fehler.message;
+            liste.appendChild(hinweis);
+        }
+    }
+
+    // Neue Beschwerde einreichen
+    formular.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const absenden = formular.querySelector(
+            "button[type='submit']"
+        );
+
+        absenden.disabled = true;
+        meldung.textContent = "Beschwerde wird gespeichert...";
+        meldung.style.color = "#334155";
+
+        try {
+            // Formulardaten zusammenstellen
+            const daten = new URLSearchParams(
+                new FormData(formular)
+            );
+
+            // Beschwerde an das Java-Backend senden
+            const antwort = await fetch("/api/beschwerden", {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded;charset=UTF-8"
+                },
+                body: daten.toString()
+            });
+
+            const ergebnis = await antwort.json();
+
+            if (!antwort.ok) {
+                throw new Error(
+                    ergebnis.fehler || "Beschwerde konnte nicht gespeichert werden."
+                );
+            }
+
+            meldung.textContent =
+                "Beschwerde erfolgreich eingereicht!";
+            meldung.style.color = "#166534";
+
+            // Formular zurücksetzen
+            formular.reset();
+
+            // Beschwerdeübersicht aktualisieren
+            await ladeBeschwerden();
+
+        } catch (fehler) {
+            meldung.textContent = "Fehler: " + fehler.message;
+            meldung.style.color = "#b91c1c";
+        } finally {
+            absenden.disabled = false;
+        }
+    });
+
+    // Beim Öffnen der Seite Beschwerden laden
+    ladeBeschwerden();
+</script>
+
+    
+</body>
+</html>
