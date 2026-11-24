@@ -730,6 +730,34 @@ Für die Datei `Complaint.java` wurden zusätzlich folgende Werte manuell ermitt
 | Konstruktoren | 1 |
 | Parameter insgesamt | 12 |
 
+
+#### Detaillierte Parameteranzahl pro Methode
+
+Ergänzend wurde die Anzahl der Parameter pro Methode in der Klasse `Complaint.java` untersucht.
+
+| Methode / Konstruktor | Parameteranzahl |
+|---|---:|
+| Complaint() (Konstruktor) | 5 |
+| create() | 4 |
+| validateText() | 3 |
+| startProcessing() | 0 |
+| resolve() | 0 |
+| getId() | 0 |
+| getCitizenId() | 0 |
+| getTitle() | 0 |
+| getDescription() | 0 |
+| getCategory() | 0 |
+| getStatus() | 0 |
+| getCreatedAt() | 0 |
+| getDomainEvents() | 0 |
+| **Gesamt (inkl. Konstruktor)** | **12** |
+
+Die meisten Methoden benötigen keine Parameter. Lediglich der Konstruktor sowie die Methoden create() und validateText() weisen mehrere Parameter auf.
+
+Da diese Parameter für die Erstellung und Validierung einer Beschwerde benötigt werden, ist ihre Anzahl für den aktuellen Projektumfang nachvollziehbar.
+Eine zusätzliche Umstrukturierung ist momentan nicht erforderlich. Die Analyse bezieht sich auf die ursprüngliche Domänenlogik aus Übung 4.
+
+
 ### 1.3 Interpretation der Ergebnisse
 
 Die Messwerte zeigen, dass die Datei `Complaint.java` mit 95 Codezeilen den größten Umfang und die höchsten Halstead-Werte aufweist. Sie enthält den größten Teil der Geschäftslogik, darunter die Erstellung und Validierung von Beschwerden sowie die Verwaltung der Statusänderungen.
