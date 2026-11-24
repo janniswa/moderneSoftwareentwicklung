@@ -850,6 +850,57 @@ Durch die zusätzlichen Tests konnten sämtliche zuvor nicht abgedeckten Stellen
 
 Die Verwendung von JaCoCo ermöglichte es, bisher nicht getestete Stellen gezielt zu identifizieren. Die vom LLM vorgeschlagenen zusätzlichen Testfälle waren sinnvoll und konnten erfolgreich umgesetzt werden. Besonders hilfreich war dabei die getrennte Betrachtung der einzelnen Dateien, wodurch die fehlende Testabdeckung in `ComplaintCreated.java` schnell lokalisiert werden konnte. Das angestrebte Ziel von mindestens 80 % wurde deutlich übertroffen. Die abschließende Testabdeckung beträgt sowohl bei den Instruktionen als auch bei den Verzweigungen 100 %.
 
+
+#### Erneute Coverage-Analyse nach der Frontend-Erweiterung
+
+Durch die Erweiterung der Anwendung um einen Beschwerdespeicher, einen BeschwerdeService und einen HTTP-Server wurde eine erneute Messung der Testabdeckung
+mit JaCoCo durchgeführt. Zunächst wurden zwölf zusätzliche JUnit-Tests für den Beschwerdespeicher und den BeschwerdeService ergänzt.
+Die Instruction Coverage der bisherigen Domänenlogik sowie dieser beiden Komponenten betrug weiterhin 100 %.
+Da der neue HTTP-Server zunächst nur manuell getestet wurde, sank die gesamte Testabdeckung auf 39,72 %.
+Zur Verbesserung der Testbarkeit wurde der HTTP-Server refaktorisiert, sodass er innerhalb automatisierter JUnit-Tests gestartet und beendet werden kann.
+Anschließend wurden mithilfe eines LLM zehn zusätzliche HTTP-Integrationstests entwickelt. Diese prüfen unter anderem das Erstellen und Abrufen von Beschwerden,
+ungültige Eingaben, nicht erlaubte HTTP-Methoden, die Verarbeitung von Sonderzeichen sowie die Bereitstellung der HTML-Oberfläche.
+
+#### Ergebnisse der erneuten Coverage-Messung
+
+| Metrik | Vor den HTTP-Tests | Nach den HTTP-Tests |
+|---|---:|---:|
+| Instruction Coverage | 39,72 % | 90,11 % |
+| Branch Coverage | 35,71 % | 82,14 % |
+| Line Coverage | 42,07 % | 89,76 % |
+
+#### Instruction Coverage pro Klasse
+
+| Klasse | Testabdeckung |
+|---|---:|
+| Complaint | 100 % |
+| ComplaintCreated | 100 % |
+| ComplaintStatus | 100 % |
+| BeschwerdeSpeicher | 100 % |
+| BeschwerdeService | 100 % |
+| BeschwerdeServer | 83,67 % |
+| **Gesamtabdeckung** | **90,11 %** |
+
+Die Instruction Coverage konnte durch die zusätzlichen
+HTTP-Tests um 50,39 Prozentpunkte gesteigert werden.
+
+Damit wurde der angestrebte Zielwert von 80 %
+übertroffen. Die automatisierte CI-Pipeline wurde
+erfolgreich ausgeführt.
+
+Der Einsatz des LLM unterstützte insbesondere die
+Identifikation geeigneter Testfälle und die Verbesserung
+der Testbarkeit des HTTP-Servers. Die generierten Tests
+wurden anhand der tatsächlichen Testergebnisse überprüft.
+
+Die Coverage-Messung erfolgte mit JaCoCo über den
+Maven-Befehl `mvn clean verify` in GitHub Codespaces.
+
+Die angegebenen Coverage-Werte beziehen sich auf den
+Java-Code. Die HTML-, CSS- und JavaScript-Komponenten
+wurden zusätzlich manuell im Browser getestet.
+
+
 ## 03 Technical Debt und Regelverletzungen mit LLM analysieren
 
 ### 3.1 Vorgehensweise
