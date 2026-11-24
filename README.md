@@ -1035,11 +1035,11 @@ Bearbeitungsstatus über die Benutzeroberfläche sind noch nicht implementiert.
 
 **Beschwerdeformular**
 
-![Beschwerdeformular](docs/uebung5/beschwerdeformular.png)
+![Beschwerdeformular](docs/uebung5/BeschwerdeStart.png)
 
 **Beschwerdeübersicht**
 
-![Beschwerdeübersicht](docs/uebung5/beschwerdeuebersicht.png)
+![Beschwerdeübersicht](docs/uebung5/BeschwerdeTests.png)
 
 
 ## 05 Reflexion zum Einsatz von Metriken und LLM
